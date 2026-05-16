@@ -8,6 +8,17 @@ use Illuminate\Database\Seeder;
 
 class PostSeeder extends Seeder
 {
+    protected function resolveCategoryId(string $slug): int
+    {
+        $category = Category::query()->where('slug', $slug)->first();
+
+        if (! $category) {
+            throw new \RuntimeException("Category with slug [{$slug}] was not found for post seeding.");
+        }
+
+        return (int) $category->getKey();
+    }
+
     public function run(): void
     {
         $posts = [
@@ -312,7 +323,7 @@ HTML,
             Post::updateOrCreate(
                 ['slug' => $postData['slug']],
                 array_merge($postData, [
-                    'category_id' => Category::where('slug', $categorySlug)->value('id'),
+                    'category_id' => $this->resolveCategoryId($categorySlug),
                     'status' => 'published',
                     'published_at' => now()->subDays(30 - min($index, 29)),
                 ]),

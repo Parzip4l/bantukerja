@@ -9,6 +9,17 @@ use Illuminate\Database\Seeder;
 
 class ToolSeeder extends Seeder
 {
+    protected function resolveCategoryId(string $slug): int
+    {
+        $category = Category::query()->where('slug', $slug)->first();
+
+        if (! $category) {
+            throw new \RuntimeException("Category with slug [{$slug}] was not found for tool seeding.");
+        }
+
+        return (int) $category->getKey();
+    }
+
     public function run(): void
     {
         $tools = [
@@ -103,7 +114,7 @@ class ToolSeeder extends Seeder
             $tool = Tool::updateOrCreate(
                 ['slug' => $toolData['slug']],
                 array_merge($toolData, [
-                    'category_id' => Category::where('slug', $categorySlug)->value('id'),
+                    'category_id' => $this->resolveCategoryId($categorySlug),
                     'is_featured' => true,
                     'is_published' => true,
                     'published_at' => now()->subDays(15),

@@ -9,6 +9,17 @@ use Illuminate\Database\Seeder;
 
 class DocumentTemplateSeeder extends Seeder
 {
+    protected function resolveCategoryId(string $slug): int
+    {
+        $category = Category::query()->where('slug', $slug)->first();
+
+        if (! $category) {
+            throw new \RuntimeException("Category with slug [{$slug}] was not found for document template seeding.");
+        }
+
+        return (int) $category->getKey();
+    }
+
     public function run(): void
     {
         $templates = [
@@ -338,7 +349,7 @@ HTML,
             $template = DocumentTemplate::updateOrCreate(
                 ['slug' => $templateData['slug']],
                 array_merge($templateData, [
-                    'category_id' => Category::where('slug', $categorySlug)->value('id'),
+                    'category_id' => $this->resolveCategoryId($categorySlug),
                     'is_featured' => $index < 6,
                     'is_published' => true,
                     'published_at' => now()->subDays(20 - $index),
