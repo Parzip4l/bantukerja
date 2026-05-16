@@ -1,7 +1,7 @@
 # Arsitektur BantuKerja.online
 
 ## Ringkasan
-- Stack utama: Laravel 13, Blade, Tailwind CSS 4, Filament 5, SQLite untuk lokal dan MySQL untuk production shared hosting.
+- Stack utama: Laravel 13, Blade, Tailwind CSS 4, Filament 5, MySQL/MariaDB sebagai baseline lokal dan production shared hosting.
 - Pola aplikasi: server-rendered SEO-first website dengan admin panel terpisah di `/admin`.
 - Fokus utama: halaman publik cepat, konten mudah dikelola, dan siap monetisasi AdSense tanpa hardcode.
 
