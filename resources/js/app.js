@@ -97,5 +97,52 @@ const initializeRepeaters = () => {
     });
 };
 
+const initializeMobileMenu = () => {
+    const toggle = document.querySelector('[data-mobile-menu-toggle]');
+    const panel = document.querySelector('[data-mobile-menu-panel]');
+
+    if (!toggle || !panel) {
+        return;
+    }
+
+    const closeMenu = () => {
+        panel.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    const openMenu = () => {
+        panel.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+    };
+
+    toggle.addEventListener('click', () => {
+        if (panel.classList.contains('hidden')) {
+            openMenu();
+            return;
+        }
+
+        closeMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (panel.classList.contains('hidden')) {
+            return;
+        }
+
+        if (panel.contains(event.target) || toggle.contains(event.target)) {
+            return;
+        }
+
+        closeMenu();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeMenu();
+        }
+    });
+};
+
 copyToClipboard();
 initializeRepeaters();
+initializeMobileMenu();

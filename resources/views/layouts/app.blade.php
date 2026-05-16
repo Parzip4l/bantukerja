@@ -29,15 +29,31 @@
                     <a href="{{ route('pages.about') }}" class="hover:text-blue-700">About</a>
                     <a href="{{ route('pages.contact') }}" class="hover:text-blue-700">Contact</a>
                 </nav>
+
+                <button
+                    type="button"
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm md:hidden"
+                    aria-label="Buka menu"
+                    aria-expanded="false"
+                    aria-controls="mobile-menu"
+                    data-mobile-menu-toggle
+                >
+                    <span class="sr-only">Toggle menu</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke-linecap="round" />
+                    </svg>
+                </button>
             </div>
 
-            <div class="border-t border-slate-200/70 bg-white/95 md:hidden">
-                <div class="container-shell -mx-4 flex gap-2 overflow-x-auto px-4 py-3 text-sm font-medium text-slate-600 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                    <a href="{{ route('tools.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Tools</a>
-                    <a href="{{ route('templates.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Template</a>
-                    <a href="{{ route('blog.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Blog</a>
-                    <a href="{{ route('pages.about') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">About</a>
-                    <a href="{{ route('pages.contact') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Contact</a>
+            <div id="mobile-menu" class="hidden border-t border-slate-200/70 bg-white/95 md:hidden" data-mobile-menu-panel>
+                <div class="container-shell py-3">
+                    <nav class="grid gap-2 text-sm font-medium text-slate-700">
+                        <a href="{{ route('tools.index') }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 hover:border-blue-200 hover:text-blue-700">Tools</a>
+                        <a href="{{ route('templates.index') }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 hover:border-blue-200 hover:text-blue-700">Template</a>
+                        <a href="{{ route('blog.index') }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 hover:border-blue-200 hover:text-blue-700">Blog</a>
+                        <a href="{{ route('pages.about') }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 hover:border-blue-200 hover:text-blue-700">About</a>
+                        <a href="{{ route('pages.contact') }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 hover:border-blue-200 hover:text-blue-700">Contact</a>
+                    </nav>
                 </div>
             </div>
         </header>
