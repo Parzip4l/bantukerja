@@ -25,6 +25,12 @@ Route::post('/tools/generator-invoice/preview', [GeneratorController::class, 'pr
 Route::post('/tools/generator-invoice/pdf', [GeneratorController::class, 'downloadInvoice'])->middleware('throttle:10,1')->name('tools.invoice.pdf');
 Route::post('/tools/generator-invoice/download', [GeneratorController::class, 'downloadInvoice'])->middleware('throttle:10,1')->name('tools.invoice.download');
 Route::post('/tools/generator-invoice/print', [GeneratorController::class, 'printInvoice'])->middleware('throttle:10,1')->name('tools.invoice.print');
+Route::post('/tools/generator-kwitansi/preview', [GeneratorController::class, 'previewReceipt'])->middleware('throttle:20,1')->name('tools.receipt.preview');
+Route::post('/tools/generator-kwitansi/download', [GeneratorController::class, 'downloadReceipt'])->middleware('throttle:10,1')->name('tools.receipt.download');
+Route::post('/tools/generator-kwitansi/print', [GeneratorController::class, 'printReceipt'])->middleware('throttle:10,1')->name('tools.receipt.print');
+Route::post('/tools/generator-berita-acara/preview', [GeneratorController::class, 'previewMinutes'])->middleware('throttle:20,1')->name('tools.minutes.preview');
+Route::post('/tools/generator-berita-acara/download', [GeneratorController::class, 'downloadMinutes'])->middleware('throttle:10,1')->name('tools.minutes.download');
+Route::post('/tools/generator-berita-acara/print', [GeneratorController::class, 'printMinutes'])->middleware('throttle:10,1')->name('tools.minutes.print');
 Route::post('/tools/generator-cv-ats/calculate', [ToolController::class, 'calculateCvAts'])->middleware('throttle:20,1')->name('tools.cv-ats.calculate');
 Route::post('/tools/generator-cv-ats/pdf', [ToolController::class, 'cvAtsPdf'])->middleware('throttle:10,1')->name('tools.cv-ats.pdf');
 Route::post('/tools/generator-cv-ats/word', [ToolController::class, 'cvAtsWord'])->middleware('throttle:10,1')->name('tools.cv-ats.word');

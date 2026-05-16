@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ContactMessage;
+use App\Models\GeneratorDownloadLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -29,6 +30,8 @@ class PublicWebsiteTest extends TestCase
             '/tools/kalkulator-fee-audit',
             '/tools/generator-invoice',
             '/tools/generator-surat-izin',
+            '/tools/generator-kwitansi',
+            '/tools/generator-berita-acara',
             '/tools/generator-cv-ats',
             '/template',
             '/template/surat-resign',
@@ -106,6 +109,60 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Preview Surat')
             ->assertSee('Surat Izin Kerja')
             ->assertSee('Rizky Firmansyah');
+    }
+
+    public function test_receipt_generator_can_preview_and_log_template_usage(): void
+    {
+        $response = $this->from('/tools/generator-kwitansi')->post('/tools/generator-kwitansi/preview', [
+            'template_slug' => 'receipt-classic',
+            'receipt_number' => 'KW-2026-019',
+            'payer_name' => 'PT Cipta Solusi Digital',
+            'receiver_name' => 'BantuKerja Studio',
+            'amount' => 1750000,
+            'receipt_date' => '2026-05-16',
+            'city' => 'Jakarta',
+            'payment_method' => 'Transfer bank',
+            'description' => 'Pelunasan jasa pembukuan bulan April 2026.',
+            'notes' => 'Pembayaran tahap akhir.',
+        ]);
+
+        $response->assertRedirect('/tools/generator-kwitansi');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Kwitansi')
+            ->assertSee('PT Cipta Solusi Digital')
+            ->assertSee('BantuKerja Studio');
+
+        $this->assertDatabaseHas(GeneratorDownloadLog::class, [
+            'generator_type' => 'receipt',
+            'template_slug' => 'receipt-classic',
+            'action' => 'preview',
+        ]);
+    }
+
+    public function test_minutes_generator_can_preview_document_template(): void
+    {
+        $response = $this->from('/tools/generator-berita-acara')->post('/tools/generator-berita-acara/preview', [
+            'template_slug' => 'minutes-formal',
+            'title' => 'Berita Acara Serah Terima Dokumen',
+            'document_number' => 'BAST/05/2026',
+            'event_date' => '2026-05-16',
+            'location' => 'Jakarta Selatan',
+            'opening' => 'Pada hari ini telah dilakukan serah terima dokumen antara para pihak di bawah ini.',
+            'first_party_name' => 'Rina Maharani',
+            'first_party_role' => 'Manager Operasional',
+            'second_party_name' => 'Dimas Pratama',
+            'second_party_role' => 'Supervisor Administrasi',
+            'content' => "Pihak pertama menyerahkan dokumen operasional.\nPihak kedua menerima seluruh dokumen dalam keadaan lengkap dan baik.",
+            'closing' => 'Demikian berita acara ini dibuat untuk digunakan sebagaimana mestinya.',
+        ]);
+
+        $response->assertRedirect('/tools/generator-berita-acara');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Berita Acara')
+            ->assertSee('Berita Acara Serah Terima Dokumen')
+            ->assertSee('Rina Maharani');
     }
 
     public function test_admin_user_can_access_filament_resources(): void

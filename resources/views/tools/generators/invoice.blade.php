@@ -3,31 +3,8 @@
     $temporaryBusinessLogoPath = old('business_logo_path', $generatorPreview['payload']['business_logo_path'] ?? null);
 @endphp
 
-<div class="grid gap-6">
-    <div class="rounded-3xl border border-slate-200 p-5">
-        <h2 class="text-lg font-semibold text-slate-900">Pilih Template Desain Invoice</h2>
-        <p class="mt-2 text-sm leading-7 text-slate-600">Pilih desain invoice yang paling cocok untuk kebutuhan bisnis Anda. Preview akan menyesuaikan template yang dipilih.</p>
-
-        <div class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            @foreach ($generatorTemplates as $templateOption)
-                <label class="cursor-pointer">
-                    <input type="radio" name="template_slug" value="{{ $templateOption->slug }}" form="invoice-generator-form" class="peer sr-only" @checked($selectedTemplateSlug === $templateOption->slug)>
-                    <span class="block h-full rounded-3xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 peer-checked:border-blue-300 peer-checked:bg-blue-50/70 peer-checked:ring-2 peer-checked:ring-blue-100">
-                        <span class="flex items-start justify-between gap-3">
-                            <span>
-                                <span class="block text-sm font-semibold text-slate-900">{{ $templateOption->name }}</span>
-                                <span class="mt-2 block text-xs leading-6 text-slate-500">{{ $templateOption->description }}</span>
-                            </span>
-                            <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Gratis</span>
-                        </span>
-                    </span>
-                </label>
-            @endforeach
-        </div>
-    </div>
-
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr),minmax(320px,0.92fr)]">
-        <div class="rounded-3xl border border-slate-200 p-5">
+<div class="grid gap-6 xl:grid-cols-[minmax(0,1fr),minmax(320px,0.92fr)]">
+    <div class="generator-section order-2 xl:order-1">
             <h2 class="text-lg font-semibold text-slate-900">Isi Data Invoice</h2>
             <p class="mt-2 text-sm leading-7 text-slate-600">Data yang Anda masukkan hanya digunakan untuk membuat preview dan file unduhan, lalu tidak disimpan permanen oleh BantuKerja.online.</p>
 
@@ -37,7 +14,7 @@
                     <input type="hidden" name="business_logo_path" value="{{ $temporaryBusinessLogoPath }}">
                 @endif
 
-                <div class="rounded-3xl border border-slate-200 p-5">
+                <div class="generator-section">
                     <h3 class="text-base font-semibold text-slate-900">Profil perusahaan</h3>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
                         <div>
@@ -74,7 +51,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-3xl border border-slate-200 p-5">
+                <div class="generator-section">
                     <h3 class="text-base font-semibold text-slate-900">Data pelanggan</h3>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
                         <div>
@@ -100,7 +77,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-3xl border border-slate-200 p-5">
+                <div class="generator-section">
                     <h3 class="text-base font-semibold text-slate-900">Informasi invoice</h3>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
@@ -130,7 +107,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-3xl border border-slate-200 p-5">
+                <div class="generator-section">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <p class="text-base font-semibold text-slate-900">Item invoice</p>
                         <button type="button" data-repeater-add="invoice-items" class="inline-flex h-10 items-center rounded-2xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900">Tambah item</button>
@@ -169,7 +146,7 @@
                     </template>
                 </div>
 
-                <div class="rounded-3xl border border-slate-200 p-5">
+                <div class="generator-section">
                     <h3 class="text-base font-semibold text-slate-900">Pembayaran & catatan</h3>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
                         <div>
@@ -199,7 +176,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-wrap gap-3">
+                <div class="generator-actions">
                     <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white">Preview</button>
                     <button formaction="{{ route('tools.invoice.download') }}" class="h-12 rounded-2xl bg-blue-700 px-5 text-sm font-semibold text-white">Download PDF</button>
                     <button formaction="{{ route('tools.invoice.print') }}" formtarget="_blank" class="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Print</button>
@@ -208,15 +185,42 @@
             </form>
         </div>
 
-        <div class="rounded-3xl border border-slate-200 bg-slate-50/60 p-5">
+        <div id="invoice-preview-panel" class="generator-section order-1 self-start bg-slate-50/60 xl:order-2 xl:sticky xl:top-24">
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900">Preview Invoice</h2>
-                    <p class="mt-1 text-sm text-slate-500">Preview berubah sesuai template yang Anda pilih.</p>
+                    <p class="mt-1 text-sm text-slate-500">Template dan preview didekatkan supaya tidak perlu scroll jauh saat membandingkan desain.</p>
                 </div>
                 @if ($generatorPreview)
                     <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{{ $generatorPreview['template']->name }}</span>
                 @endif
+            </div>
+
+            <div class="mt-5 rounded-[1.75rem] border border-slate-200 bg-white p-4">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-900">Pilih Template Desain Invoice</h3>
+                        <p class="mt-1 text-xs leading-6 text-slate-500">Ganti template dari panel preview agar hasilnya lebih mudah dipantau.</p>
+                    </div>
+                    <a href="#invoice-generator-form" class="inline-flex h-10 items-center rounded-2xl border border-slate-200 px-4 text-xs font-semibold text-slate-700 xl:hidden">Isi data</a>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    @foreach ($generatorTemplates as $templateOption)
+                        <label class="cursor-pointer">
+                            <input type="radio" name="template_slug" value="{{ $templateOption->slug }}" form="invoice-generator-form" class="peer sr-only" @checked($selectedTemplateSlug === $templateOption->slug)>
+                            <span class="block h-full rounded-3xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 peer-checked:border-blue-300 peer-checked:bg-blue-50/70 peer-checked:ring-2 peer-checked:ring-blue-100">
+                                <span class="flex items-start justify-between gap-3">
+                                    <span>
+                                        <span class="block text-sm font-semibold text-slate-900">{{ $templateOption->name }}</span>
+                                        <span class="mt-2 block text-xs leading-6 text-slate-500">{{ $templateOption->description }}</span>
+                                    </span>
+                                    <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Gratis</span>
+                                </span>
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
             </div>
 
             <div class="mt-5 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white p-3 shadow-sm">

@@ -79,4 +79,28 @@
     .prose-content ol {
         @apply list-decimal pl-6;
     }
+
+    .tool-input {
+        @apply h-11 w-full rounded-2xl border border-slate-200 px-4 text-[15px] text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none sm:h-12;
+    }
+
+    .tool-textarea {
+        @apply w-full rounded-2xl border border-slate-200 px-4 py-3 text-[15px] text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none;
+    }
+
+    .tool-select {
+        @apply h-11 w-full rounded-2xl border border-slate-200 px-4 text-[15px] text-slate-700 focus:border-blue-400 focus:outline-none sm:h-12;
+    }
+
+    .generator-section {
+        @apply rounded-[1.5rem] border border-slate-200 p-4 sm:rounded-3xl sm:p-5;
+    }
+
+    .generator-actions {
+        @apply grid gap-3 sm:flex sm:flex-wrap;
+    }
+
+    .generator-actions > * {
+        @apply inline-flex w-full items-center justify-center sm:w-auto;
+    }
 }

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AuditFeeRequest;
 use App\Http\Requests\CvAtsGeneratorRequest;
-use App\Http\Requests\InvoiceGeneratorRequest;
-use App\Http\Requests\LeaveLetterGeneratorRequest;
 use App\Http\Requests\OvertimeCalculatorRequest;
 use App\Http\Requests\ProfessionalServiceFeeRequest;
 use App\Http\Requests\SalaryCalculatorRequest;
@@ -188,75 +186,6 @@ class ToolController extends Controller
                 (float) $request->input('company_revenue'),
             ),
         ]);
-    }
-
-    public function calculateInvoice(InvoiceGeneratorRequest $request, ToolCalculationService $service): RedirectResponse
-    {
-        $summary = $service->calculateInvoiceTotal(
-            $request->input('items', []),
-            (float) $request->input('tax', 0),
-            (float) $request->input('discount', 0),
-        );
-        $payload = $request->safe()->except(['business_logo']);
-
-        if ($request->hasFile('business_logo')) {
-            $payload['business_logo_path'] = app(TemplateRenderService::class)
-                ->storePublicUpload($request->file('business_logo'), 'tool-uploads/invoices/logos');
-        }
-
-        return back()->withInput()->with('tool_result', [
-            'type' => 'invoice',
-            'data' => array_merge($payload, $summary, [
-                'business_logo_url' => app(TemplateRenderService::class)->publicUrl($payload['business_logo_path'] ?? null),
-            ]),
-        ]);
-    }
-
-    public function invoicePdf(
-        InvoiceGeneratorRequest $request,
-        ToolCalculationService $service,
-        TemplateRenderService $templateRenderService,
-    ) {
-        $payload = $request->safe()->except(['business_logo']);
-        $summary = $service->calculateInvoiceTotal(
-            $request->input('items', []),
-            (float) $request->input('tax', 0),
-            (float) $request->input('discount', 0),
-        );
-
-        if ($request->hasFile('business_logo')) {
-            $payload['business_logo_path'] = $templateRenderService
-                ->storePublicUpload($request->file('business_logo'), 'tool-uploads/invoices/logos');
-        }
-
-        return $templateRenderService
-            ->invoicePdf(array_merge($payload, $summary, [
-                'business_logo_url' => $templateRenderService->publicUrl($payload['business_logo_path'] ?? null),
-                'business_logo_pdf_path' => $templateRenderService->publicStoragePath($payload['business_logo_path'] ?? null),
-            ]))
-            ->download('invoice-'.$request->input('invoice_number').'.pdf');
-    }
-
-    public function calculateLeaveLetter(
-        LeaveLetterGeneratorRequest $request,
-        TemplateRenderService $templateRenderService,
-    ): RedirectResponse {
-        return back()->withInput()->with('tool_result', [
-            'type' => 'leave-letter',
-            'data' => [
-                'payload' => $request->validated(),
-                'content' => $templateRenderService->renderLeaveLetter($request->validated()),
-            ],
-        ]);
-    }
-
-    public function downloadLeaveLetter(
-        LeaveLetterGeneratorRequest $request,
-        TemplateRenderService $templateRenderService,
-    ) {
-        $content = $templateRenderService->renderLeaveLetter($request->validated());
-
-        return $templateRenderService->downloadText('surat-izin-kerja.txt', $content);
     }
 
     public function calculateCvAts(

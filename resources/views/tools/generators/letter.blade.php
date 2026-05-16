@@ -2,31 +2,8 @@
     $selectedTemplateSlug = old('template_slug', $generatorPreview['template_slug'] ?? $generatorTemplates->first()?->slug);
 @endphp
 
-<div class="grid gap-6">
-    <div class="rounded-3xl border border-slate-200 p-5">
-        <h2 class="text-lg font-semibold text-slate-900">Pilih Template Desain Surat</h2>
-        <p class="mt-2 text-sm leading-7 text-slate-600">Setiap template menampilkan gaya surat yang berbeda, mulai dari formal sampai lebih ringkas.</p>
-
-        <div class="mt-5 grid gap-4 sm:grid-cols-3">
-            @foreach ($generatorTemplates as $templateOption)
-                <label class="cursor-pointer">
-                    <input type="radio" name="template_slug" value="{{ $templateOption->slug }}" form="letter-generator-form" class="peer sr-only" @checked($selectedTemplateSlug === $templateOption->slug)>
-                    <span class="block h-full rounded-3xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 peer-checked:border-blue-300 peer-checked:bg-blue-50/70 peer-checked:ring-2 peer-checked:ring-blue-100">
-                        <span class="flex items-start justify-between gap-3">
-                            <span>
-                                <span class="block text-sm font-semibold text-slate-900">{{ $templateOption->name }}</span>
-                                <span class="mt-2 block text-xs leading-6 text-slate-500">{{ $templateOption->description }}</span>
-                            </span>
-                            <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Gratis</span>
-                        </span>
-                    </span>
-                </label>
-            @endforeach
-        </div>
-    </div>
-
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr),minmax(320px,1fr)]">
-        <div class="rounded-3xl border border-slate-200 p-5">
+<div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr),minmax(320px,1fr)]">
+    <div class="generator-section order-2 xl:order-1">
             <h2 class="text-lg font-semibold text-slate-900">Isi Data Surat</h2>
             <p class="mt-2 text-sm leading-7 text-slate-600">Data Anda hanya dipakai untuk membuat preview, PDF, print view, dan copy text. BantuKerja.online tidak menyimpannya secara permanen.</p>
 
@@ -62,7 +39,7 @@
                     <textarea name="reason" rows="5" class="w-full rounded-2xl border border-slate-200 px-4 py-3">{{ old('reason') }}</textarea>
                 </div>
 
-                <div class="sm:col-span-2 flex flex-wrap gap-3">
+                <div class="generator-actions sm:col-span-2">
                     <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white">Preview</button>
                     <button formaction="{{ route('tools.leave-letter.pdf') }}" class="h-12 rounded-2xl bg-blue-700 px-5 text-sm font-semibold text-white">Download PDF</button>
                     <button formaction="{{ route('tools.leave-letter.print') }}" formtarget="_blank" class="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Print</button>
@@ -73,19 +50,46 @@
 
             @if ($generatorPreview && $generatorPreview['copy_text'])
                 <pre id="letter-copy-content" class="sr-only">{{ $generatorPreview['copy_text'] }}</pre>
-                <button type="button" data-copy-target="#letter-copy-content" class="mt-4 inline-flex h-11 items-center rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Copy text surat</button>
+                <button type="button" data-copy-target="#letter-copy-content" class="mt-4 inline-flex h-11 w-full items-center justify-center rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700 sm:w-auto">Copy text surat</button>
             @endif
         </div>
 
-        <div class="rounded-3xl border border-slate-200 bg-slate-50/60 p-5">
+        <div id="letter-preview-panel" class="generator-section order-1 self-start bg-slate-50/60 xl:order-2 xl:sticky xl:top-24">
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900">Preview Surat</h2>
-                    <p class="mt-1 text-sm text-slate-500">Cek tata letak dan isi surat sebelum mengunduh.</p>
+                    <p class="mt-1 text-sm text-slate-500">Pilih template lalu cek hasil surat di panel yang sama.</p>
                 </div>
                 @if ($generatorPreview)
                     <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{{ $generatorPreview['template']->name }}</span>
                 @endif
+            </div>
+
+            <div class="mt-5 rounded-[1.75rem] border border-slate-200 bg-white p-4">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-900">Pilih Template Desain Surat</h3>
+                        <p class="mt-1 text-xs leading-6 text-slate-500">Template dipilih di sini supaya preview selalu dekat dan mudah dibandingkan.</p>
+                    </div>
+                    <a href="#letter-generator-form" class="inline-flex h-10 items-center rounded-2xl border border-slate-200 px-4 text-xs font-semibold text-slate-700 xl:hidden">Isi data</a>
+                </div>
+
+                <div class="mt-4 grid gap-3">
+                    @foreach ($generatorTemplates as $templateOption)
+                        <label class="cursor-pointer">
+                            <input type="radio" name="template_slug" value="{{ $templateOption->slug }}" form="letter-generator-form" class="peer sr-only" @checked($selectedTemplateSlug === $templateOption->slug)>
+                            <span class="block rounded-3xl border border-slate-200 bg-white p-4 transition hover:border-blue-200 peer-checked:border-blue-300 peer-checked:bg-blue-50/70 peer-checked:ring-2 peer-checked:ring-blue-100">
+                                <span class="flex items-start justify-between gap-3">
+                                    <span>
+                                        <span class="block text-sm font-semibold text-slate-900">{{ $templateOption->name }}</span>
+                                        <span class="mt-2 block text-xs leading-6 text-slate-500">{{ $templateOption->description }}</span>
+                                    </span>
+                                    <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Gratis</span>
+                                </span>
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
             </div>
 
             <div class="mt-5 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white p-3 shadow-sm">

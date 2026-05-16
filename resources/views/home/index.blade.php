@@ -27,22 +27,22 @@
                     Bantukerja.online membantu pengguna menyelesaikan pekerjaan administratif lebih cepat lewat kalkulator praktis, generator dokumen, template siap pakai, dan artikel yang mudah dipahami.
                 </p>
 
-                <form action="{{ route('tools.index') }}" method="get" class="mt-6 flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:mt-8 sm:p-4 sm:flex-row">
+                <form action="{{ route('tools.index') }}" method="get" class="mt-6 grid gap-2.5 rounded-[1.75rem] border border-slate-200 bg-white p-2.5 shadow-sm sm:mt-8 sm:flex sm:flex-row sm:gap-3 sm:rounded-3xl sm:p-4">
                     <input
                         type="search"
                         name="search"
                         placeholder="Cari tools seperti THR, invoice, surat izin..."
-                        class="h-12 min-w-0 flex-1 rounded-2xl border border-slate-200 px-4 text-sm text-slate-700 outline-none ring-0 placeholder:text-slate-400 focus:border-blue-400"
+                        class="tool-input min-w-0 flex-1 rounded-[1.1rem] sm:rounded-2xl"
                     >
-                    <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-blue-700 sm:px-6">
+                    <button class="inline-flex h-12 items-center justify-center rounded-[1.1rem] bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto sm:rounded-2xl sm:px-6">
                         Cari tool
                     </button>
                 </form>
 
-                <div class="mt-6 flex flex-wrap gap-2.5 text-sm sm:mt-8 sm:gap-3">
-                    <a href="{{ route('tools.show', 'kalkulator-thr') }}" class="rounded-full border border-blue-200 bg-blue-50 px-3.5 py-2 text-blue-700 sm:px-4">Kalkulator THR</a>
-                    <a href="{{ route('tools.show', 'generator-invoice') }}" class="rounded-full border border-orange-200 bg-orange-50 px-3.5 py-2 text-orange-700 sm:px-4">Generator Invoice</a>
-                    <a href="{{ route('templates.show', 'surat-resign') }}" class="rounded-full border border-slate-200 bg-white px-3.5 py-2 text-slate-700 sm:px-4">Template Surat Resign</a>
+                <div class="-mx-4 mt-6 flex gap-2.5 overflow-x-auto px-4 pb-1 text-sm sm:mx-0 sm:mt-8 sm:flex-wrap sm:overflow-visible sm:px-0 sm:gap-3">
+                    <a href="{{ route('tools.show', 'kalkulator-thr') }}" class="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-2 text-blue-700 sm:px-4">Kalkulator THR</a>
+                    <a href="{{ route('tools.show', 'generator-invoice') }}" class="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-2 text-orange-700 sm:px-4">Generator Invoice</a>
+                    <a href="{{ route('templates.show', 'surat-resign') }}" class="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-slate-700 sm:px-4">Template Surat Resign</a>
                 </div>
             </div>
         </div>

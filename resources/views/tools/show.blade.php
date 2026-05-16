@@ -171,6 +171,14 @@
                             @include('tools.generators.invoice')
                         @break
 
+                        @case('generator-kwitansi')
+                            @include('tools.generators.receipt')
+                        @break
+
+                        @case('generator-berita-acara')
+                            @include('tools.generators.minutes')
+                        @break
+
                         @case('generator-cv-ats')
                             <form method="post" action="{{ route('tools.cv-ats.calculate') }}" class="grid gap-6">
                                 @csrf
@@ -311,6 +319,7 @@
                         @break
 
                         @case('generator-surat-izin')
+                        @case('generator-surat-kuasa')
                             @include('tools.generators.letter')
                         @break
                     @endswitch
