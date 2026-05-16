@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" rx="32" fill="#0F172A"/>
+  <rect x="58" y="58" width="1084" height="514" rx="28" fill="#F8FAFC"/>
+  <rect x="96" y="96" width="160" height="160" rx="32" fill="#2563EB"/>
+  <text x="145" y="196" font-family="Arial, sans-serif" font-size="76" font-weight="700" fill="white">BK</text>
+  <text x="310" y="184" font-family="Arial, sans-serif" font-size="58" font-weight="700" fill="#0F172A">BantuKerja.online</text>
+  <text x="310" y="256" font-family="Arial, sans-serif" font-size="30" fill="#334155">Tools dan template gratis untuk kerja, bisnis, dan administrasi harian.</text>
+  <rect x="96" y="338" width="240" height="72" rx="18" fill="#EFF6FF"/>
+  <text x="132" y="383" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#1D4ED8">SEO-first tools</text>
+  <rect x="364" y="338" width="270" height="72" rx="18" fill="#FFF7ED"/>
+  <text x="400" y="383" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#C2410C">Template gratis</text>
+  <rect x="662" y="338" width="280" height="72" rx="18" fill="#E2E8F0"/>
+  <text x="698" y="383" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#0F172A">Siap AdSense</text>
+</svg>
