@@ -26,11 +26,13 @@
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             @forelse ($templates as $template)
-                <a href="{{ route('templates.show', $template->slug) }}" class="card-panel p-6 hover:border-blue-200">
-                    <p class="text-sm font-medium text-orange-600">{{ $template->category?->name }}</p>
-                    <h2 class="mt-3 text-xl font-semibold text-slate-900">{{ $template->title }}</h2>
-                    <p class="mt-3 text-sm leading-7 text-slate-600">{{ $template->short_description }}</p>
-                </a>
+                @if (filled($template->slug))
+                    <a href="{{ route('templates.show', $template->slug) }}" class="card-panel p-6 hover:border-blue-200">
+                        <p class="text-sm font-medium text-orange-600">{{ $template->category?->name }}</p>
+                        <h2 class="mt-3 text-xl font-semibold text-slate-900">{{ $template->title }}</h2>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">{{ $template->short_description }}</p>
+                    </a>
+                @endif
             @empty
                 <div class="card-panel p-8 text-sm text-slate-600 md:col-span-2 xl:col-span-3">Belum ada template yang cocok dengan filter Anda.</div>
             @endforelse

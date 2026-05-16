@@ -93,7 +93,9 @@
                     <h2 class="text-lg font-semibold text-slate-900">Template terkait</h2>
                     <div class="mt-4 space-y-4">
                         @foreach ($relatedTemplates as $template)
-                            <a href="{{ route('templates.show', $template->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $template->title }}</a>
+                            @if (filled($template->slug))
+                                <a href="{{ route('templates.show', $template->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $template->title }}</a>
+                            @endif
                         @endforeach
                     </div>
                 </div>
