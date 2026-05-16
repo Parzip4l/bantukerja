@@ -36,7 +36,7 @@ class ToolForm
             Section::make('Media & FAQ')
                 ->schema([
                     FileUpload::make('og_image')
-                        ->disk('public')
+                        ->disk('uploads')
                         ->directory('tools/og-images')
                         ->image()
                         ->imageEditor()

@@ -40,7 +40,7 @@ class PostForm
                 ->schema([
                     FileUpload::make('featured_image')
                         ->label('Featured image')
-                        ->disk('public')
+                        ->disk('uploads')
                         ->directory('posts/featured-images')
                         ->image()
                         ->imageEditor()
@@ -48,7 +48,7 @@ class PostForm
                         ->columnSpan(1),
                     FileUpload::make('og_image')
                         ->label('OG image')
-                        ->disk('public')
+                        ->disk('uploads')
                         ->directory('posts/og-images')
                         ->image()
                         ->imageEditor()
