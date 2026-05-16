@@ -23,6 +23,7 @@
                 <div class="mt-6 card-panel p-7">
                     <div class="flex flex-wrap gap-3">
                         <button type="button" data-copy-target="#template-content" class="h-11 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white">Copy template</button>
+                        <a href="{{ route('templates.download-word', $template->slug) }}" class="inline-flex h-11 items-center rounded-2xl bg-blue-700 px-5 text-sm font-semibold text-white">Download Word</a>
                         <a href="{{ route('templates.download', $template->slug) }}" class="inline-flex h-11 items-center rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Download TXT</a>
                     </div>
                     <div id="template-content" class="prose-content mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-6">

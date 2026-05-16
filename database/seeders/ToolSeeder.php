@@ -78,6 +78,20 @@ class ToolSeeder extends Seeder
                     ['question' => 'Apakah format surat bisa diedit?', 'answer' => 'Bisa. Anda dapat menyalin hasil surat lalu menyesuaikannya dengan kebutuhan perusahaan.'],
                 ],
             ],
+            [
+                'category_slug' => 'generator-dokumen',
+                'title' => 'Generator CV ATS',
+                'slug' => 'generator-cv-ats',
+                'short_description' => 'Buat CV ATS-friendly yang detail, rapi, dan siap diunduh dalam format PDF atau Word.',
+                'tool_type' => 'generator',
+                'meta_title' => 'Generator CV ATS Gratis',
+                'meta_description' => 'Buat CV ATS-friendly lengkap dengan pengalaman kerja, pendidikan, skill, dan ekspor PDF atau Word.',
+                'body' => '<h2>Kenapa CV ATS penting?</h2><p>CV ATS-friendly membantu informasi inti Anda lebih mudah dipindai oleh sistem rekrutmen modern sekaligus tetap nyaman dibaca recruiter.</p><h2>Apa yang dihasilkan?</h2><p>Tool ini menghasilkan struktur CV profesional yang menonjolkan ringkasan, skill, pengalaman, pendidikan, dan kredensial penting dalam format yang rapi.</p>',
+                'faqs' => [
+                    ['question' => 'Apakah CV ini cocok untuk ATS?', 'answer' => 'Ya, struktur yang digunakan dibuat sederhana, fokus pada konten inti, dan minim elemen yang mengganggu proses parsing ATS.'],
+                    ['question' => 'Apakah hasil CV bisa diedit lagi?', 'answer' => 'Bisa. Anda dapat mengunduh hasilnya dalam format Word atau PDF lalu menyesuaikannya sebelum dikirim.'],
+                ],
+            ],
         ];
 
         foreach ($tools as $toolData) {

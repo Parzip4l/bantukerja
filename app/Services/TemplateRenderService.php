@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TemplateRenderService
@@ -36,8 +38,55 @@ class TemplateRenderService
         ]);
     }
 
+    public function downloadWord(string $filename, string $title, string $html): StreamedResponse
+    {
+        $document = view('partials.word-document', [
+            'title' => $title,
+            'content' => $html,
+        ])->render();
+
+        return response()->streamDownload(function () use ($document): void {
+            echo $document;
+        }, $filename, [
+            'Content-Type' => 'application/msword; charset=UTF-8',
+        ]);
+    }
+
     public function invoicePdf(array $payload)
     {
         return Pdf::loadView('pdf.invoice', $payload)->setPaper('a4');
+    }
+
+    public function cvPdf(array $payload)
+    {
+        return Pdf::loadView('pdf.cv-ats', $payload)->setPaper('a4');
+    }
+
+    public function cvWordHtml(array $payload): string
+    {
+        return view('word.cv-ats', $payload)->render();
+    }
+
+    public function storePublicUpload(UploadedFile $file, string $directory): string
+    {
+        return $file->store($directory, 'public');
+    }
+
+    public function publicUrl(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($path);
+    }
+
+    public function publicStoragePath(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        return storage_path('app/public/'.$path);
     }
 }

@@ -18,12 +18,16 @@ Route::post('/tools/kalkulator-gaji-bersih/calculate', [ToolController::class, '
 Route::post('/tools/kalkulator-lembur/calculate', [ToolController::class, 'calculateOvertime'])->middleware('throttle:20,1')->name('tools.overtime.calculate');
 Route::post('/tools/generator-invoice/calculate', [ToolController::class, 'calculateInvoice'])->middleware('throttle:20,1')->name('tools.invoice.calculate');
 Route::post('/tools/generator-invoice/pdf', [ToolController::class, 'invoicePdf'])->middleware('throttle:10,1')->name('tools.invoice.pdf');
+Route::post('/tools/generator-cv-ats/calculate', [ToolController::class, 'calculateCvAts'])->middleware('throttle:20,1')->name('tools.cv-ats.calculate');
+Route::post('/tools/generator-cv-ats/pdf', [ToolController::class, 'cvAtsPdf'])->middleware('throttle:10,1')->name('tools.cv-ats.pdf');
+Route::post('/tools/generator-cv-ats/word', [ToolController::class, 'cvAtsWord'])->middleware('throttle:10,1')->name('tools.cv-ats.word');
 Route::post('/tools/generator-surat-izin/calculate', [ToolController::class, 'calculateLeaveLetter'])->middleware('throttle:20,1')->name('tools.leave-letter.calculate');
 Route::post('/tools/generator-surat-izin/download', [ToolController::class, 'downloadLeaveLetter'])->middleware('throttle:10,1')->name('tools.leave-letter.download');
 
 Route::get('/template', [TemplateController::class, 'index'])->name('templates.index');
 Route::get('/template/{slug}', [TemplateController::class, 'show'])->name('templates.show');
 Route::get('/template/{slug}/download.txt', [TemplateController::class, 'download'])->name('templates.download');
+Route::get('/template/{slug}/download.doc', [TemplateController::class, 'downloadWord'])->name('templates.download-word');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');

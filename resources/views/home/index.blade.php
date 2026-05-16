@@ -46,30 +46,7 @@
                 </div>
             </div>
 
-            <div class="card-panel p-8">
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="rounded-2xl bg-slate-900 p-5 text-white">
-                        <p class="text-sm text-slate-200">Tools publik</p>
-                        <p class="mt-2 text-3xl font-semibold">5+</p>
-                        <p class="mt-2 text-sm text-slate-300">Kalkulator dan generator ringan yang ramah mobile.</p>
-                    </div>
-                    <div class="rounded-2xl bg-blue-50 p-5">
-                        <p class="text-sm text-blue-700">Template gratis</p>
-                        <p class="mt-2 text-3xl font-semibold text-slate-900">10</p>
-                        <p class="mt-2 text-sm text-slate-600">Dokumen siap salin untuk kebutuhan kerja dan bisnis.</p>
-                    </div>
-                    <div class="rounded-2xl bg-orange-50 p-5">
-                        <p class="text-sm text-orange-700">Artikel edukatif</p>
-                        <p class="mt-2 text-3xl font-semibold text-slate-900">10</p>
-                        <p class="mt-2 text-sm text-slate-600">Konten SEO-friendly yang membantu ranking organik.</p>
-                    </div>
-                    <div class="rounded-2xl bg-slate-100 p-5">
-                        <p class="text-sm text-slate-700">Siap monetisasi</p>
-                        <p class="mt-2 text-3xl font-semibold text-slate-900">AdSense</p>
-                        <p class="mt-2 text-sm text-slate-600">Slot iklan sudah disiapkan tanpa hardcode client ID.</p>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </section>
 

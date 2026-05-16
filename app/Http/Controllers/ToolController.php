@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CvAtsGeneratorRequest;
 use App\Http\Requests\InvoiceGeneratorRequest;
 use App\Http\Requests\LeaveLetterGeneratorRequest;
 use App\Http\Requests\OvertimeCalculatorRequest;
 use App\Http\Requests\SalaryCalculatorRequest;
 use App\Http\Requests\ThrCalculatorRequest;
 use App\Models\Category;
+use App\Models\DocumentTemplate;
+use App\Models\Post;
 use App\Models\Tool;
 use App\Services\SeoService;
 use App\Services\TemplateRenderService;
@@ -53,12 +56,29 @@ class ToolController extends Controller
             ->published()
             ->where('slug', $slug)
             ->firstOrFail();
+        $relatedPosts = $tool->relatedPosts()->limit(4)->get();
+        $relatedTemplates = $tool->relatedTemplates()->limit(4)->get();
+
+        if ($relatedPosts->isEmpty()) {
+            $relatedPosts = Post::published()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
+
+        if ($relatedTemplates->isEmpty()) {
+            $relatedTemplates = DocumentTemplate::published()
+                ->featured()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
 
         return view('tools.show', [
             'tool' => $tool,
             'seo' => $seoService->forModel($tool),
-            'relatedPosts' => $tool->relatedPosts()->limit(4)->get(),
-            'relatedTemplates' => $tool->relatedTemplates()->limit(4)->get(),
+            'relatedPosts' => $relatedPosts,
+            'relatedTemplates' => $relatedTemplates,
         ]);
     }
 
@@ -107,10 +127,18 @@ class ToolController extends Controller
             (float) $request->input('tax', 0),
             (float) $request->input('discount', 0),
         );
+        $payload = $request->safe()->except(['business_logo']);
+
+        if ($request->hasFile('business_logo')) {
+            $payload['business_logo_path'] = app(TemplateRenderService::class)
+                ->storePublicUpload($request->file('business_logo'), 'tool-uploads/invoices/logos');
+        }
 
         return back()->withInput()->with('tool_result', [
             'type' => 'invoice',
-            'data' => array_merge($request->validated(), $summary),
+            'data' => array_merge($payload, $summary, [
+                'business_logo_url' => app(TemplateRenderService::class)->publicUrl($payload['business_logo_path'] ?? null),
+            ]),
         ]);
     }
 
@@ -119,14 +147,23 @@ class ToolController extends Controller
         ToolCalculationService $service,
         TemplateRenderService $templateRenderService,
     ) {
+        $payload = $request->safe()->except(['business_logo']);
         $summary = $service->calculateInvoiceTotal(
             $request->input('items', []),
             (float) $request->input('tax', 0),
             (float) $request->input('discount', 0),
         );
 
+        if ($request->hasFile('business_logo')) {
+            $payload['business_logo_path'] = $templateRenderService
+                ->storePublicUpload($request->file('business_logo'), 'tool-uploads/invoices/logos');
+        }
+
         return $templateRenderService
-            ->invoicePdf(array_merge($request->validated(), $summary))
+            ->invoicePdf(array_merge($payload, $summary, [
+                'business_logo_url' => $templateRenderService->publicUrl($payload['business_logo_path'] ?? null),
+                'business_logo_pdf_path' => $templateRenderService->publicStoragePath($payload['business_logo_path'] ?? null),
+            ]))
             ->download('invoice-'.$request->input('invoice_number').'.pdf');
     }
 
@@ -150,5 +187,41 @@ class ToolController extends Controller
         $content = $templateRenderService->renderLeaveLetter($request->validated());
 
         return $templateRenderService->downloadText('surat-izin-kerja.txt', $content);
+    }
+
+    public function calculateCvAts(
+        CvAtsGeneratorRequest $request,
+        ToolCalculationService $service,
+    ): RedirectResponse {
+        return back()->withInput()->with('tool_result', [
+            'type' => 'cv-ats',
+            'data' => $service->prepareCvAtsData($request->validated()),
+        ]);
+    }
+
+    public function cvAtsPdf(
+        CvAtsGeneratorRequest $request,
+        ToolCalculationService $service,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $payload = $service->prepareCvAtsData($request->validated());
+
+        return $templateRenderService
+            ->cvPdf($payload)
+            ->download('cv-ats-'.str($request->input('full_name'))->slug().'.pdf');
+    }
+
+    public function cvAtsWord(
+        CvAtsGeneratorRequest $request,
+        ToolCalculationService $service,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $payload = $service->prepareCvAtsData($request->validated());
+
+        return $templateRenderService->downloadWord(
+            'cv-ats-'.str($request->input('full_name'))->slug().'.doc',
+            'CV ATS - '.$request->input('full_name'),
+            $templateRenderService->cvWordHtml($payload),
+        );
     }
 }

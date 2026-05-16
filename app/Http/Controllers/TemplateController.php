@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\DocumentTemplate;
+use App\Models\Post;
+use App\Models\Tool;
 use App\Services\SeoService;
 use App\Services\TemplateRenderService;
 use Illuminate\Http\Request;
@@ -46,12 +48,29 @@ class TemplateController extends Controller
             ->published()
             ->where('slug', $slug)
             ->firstOrFail();
+        $relatedPosts = $template->relatedPosts()->limit(4)->get();
+        $relatedTools = $template->relatedTools()->limit(4)->get();
+
+        if ($relatedPosts->isEmpty()) {
+            $relatedPosts = Post::published()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
+
+        if ($relatedTools->isEmpty()) {
+            $relatedTools = Tool::published()
+                ->featured()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
 
         return view('templates.show', [
             'template' => $template,
             'seo' => $seoService->forModel($template),
-            'relatedPosts' => $template->relatedPosts()->limit(4)->get(),
-            'relatedTools' => $template->relatedTools()->limit(4)->get(),
+            'relatedPosts' => $relatedPosts,
+            'relatedTools' => $relatedTools,
         ]);
     }
 
@@ -60,5 +79,16 @@ class TemplateController extends Controller
         $template = DocumentTemplate::published()->where('slug', $slug)->firstOrFail();
 
         return $templateRenderService->downloadText($template->slug.'.txt', strip_tags($template->content));
+    }
+
+    public function downloadWord(string $slug, TemplateRenderService $templateRenderService)
+    {
+        $template = DocumentTemplate::published()->where('slug', $slug)->firstOrFail();
+
+        return $templateRenderService->downloadWord(
+            $template->slug.'.doc',
+            $template->title,
+            $template->content,
+        );
     }
 }

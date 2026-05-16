@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+
 class ToolCalculationService
 {
     public function calculateThr(float $monthlySalary, int $monthsWorked, ?string $employeeStatus = null): array
@@ -70,6 +72,8 @@ class ToolCalculationService
 
                 return [
                     'name' => trim((string) ($item['name'] ?? '')),
+                    'description' => trim((string) ($item['description'] ?? '')),
+                    'unit' => trim((string) ($item['unit'] ?? '')),
                     'qty' => $qty,
                     'price' => $price,
                     'subtotal' => round($qty * $price, 2),
@@ -91,5 +95,71 @@ class ToolCalculationService
             'discount_amount' => round($discountAmount, 2),
             'grand_total' => round($grandTotal, 2),
         ];
+    }
+
+    public function prepareCvAtsData(array $data): array
+    {
+        $skills = collect(preg_split('/[\r\n,]+/', (string) ($data['skills'] ?? '')))
+            ->map(fn (?string $skill): string => trim((string) $skill))
+            ->filter()
+            ->values()
+            ->all();
+
+        $languages = collect(preg_split('/[\r\n,]+/', (string) ($data['languages'] ?? '')))
+            ->map(fn (?string $language): string => trim((string) $language))
+            ->filter()
+            ->values()
+            ->all();
+
+        $certifications = collect(preg_split('/\r\n|\r|\n/', (string) ($data['certifications'] ?? '')))
+            ->map(fn (?string $item): string => trim((string) $item))
+            ->filter()
+            ->values()
+            ->all();
+
+        $achievements = collect(preg_split('/\r\n|\r|\n/', (string) ($data['achievements'] ?? '')))
+            ->map(fn (?string $item): string => trim((string) $item))
+            ->filter()
+            ->values()
+            ->all();
+
+        $experiences = collect($data['work_experiences'] ?? [])
+            ->map(function (array $experience): array {
+                return [
+                    'job_title' => $experience['job_title'],
+                    'company' => $experience['company'],
+                    'location' => $experience['location'] ?? '',
+                    'period' => date('M Y', strtotime($experience['start_date'])).' - '.(($experience['is_current'] ?? false) ? 'Sekarang' : ($experience['end_date'] ? date('M Y', strtotime($experience['end_date'])) : 'Sekarang')),
+                    'description_points' => collect(preg_split('/\r\n|\r|\n/', (string) $experience['description']))
+                        ->map(fn (?string $point): string => trim(Str::start((string) $point, '')))
+                        ->filter()
+                        ->values()
+                        ->all(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $educations = collect($data['educations'] ?? [])
+            ->map(function (array $education): array {
+                return [
+                    'degree' => $education['degree'],
+                    'institution' => $education['institution'],
+                    'location' => $education['location'] ?? '',
+                    'period' => $education['start_year'].' - '.($education['end_year'] ?: 'Sekarang'),
+                    'description' => $education['description'] ?? '',
+                ];
+            })
+            ->values()
+            ->all();
+
+        return array_merge($data, [
+            'skills_list' => $skills,
+            'languages_list' => $languages,
+            'certifications_list' => $certifications,
+            'achievements_list' => $achievements,
+            'work_experiences_prepared' => $experiences,
+            'educations_prepared' => $educations,
+        ]);
     }
 }

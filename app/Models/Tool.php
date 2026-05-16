@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ResolvesCategorySlug;
+use App\Support\RelatedContentMap;
 use Database\Factories\ToolFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +15,8 @@ class Tool extends Model
 {
     /** @use HasFactory<ToolFactory> */
     use HasFactory;
+
+    use ResolvesCategorySlug;
 
     protected $fillable = [
         'category_id',
@@ -51,17 +55,19 @@ class Tool extends Model
 
     public function relatedPosts()
     {
+        $categorySlugs = RelatedContentMap::for($this->resolveCategorySlug())['blog'];
+
         return Post::published()
-            ->where('category_id', $this->category_id)
-            ->whereNotNull('category_id')
+            ->whereHas('category', fn ($builder) => $builder->whereIn('slug', $categorySlugs))
             ->latestPublished();
     }
 
     public function relatedTemplates()
     {
+        $categorySlugs = RelatedContentMap::for($this->resolveCategorySlug())['template'];
+
         return DocumentTemplate::published()
-            ->where('category_id', $this->category_id)
-            ->whereNotNull('category_id')
+            ->whereHas('category', fn ($builder) => $builder->whereIn('slug', $categorySlugs))
             ->latestPublished();
     }
 

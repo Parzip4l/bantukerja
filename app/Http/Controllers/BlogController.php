@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\DocumentTemplate;
 use App\Models\Post;
+use App\Models\Tool;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,15 +48,42 @@ class BlogController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
         $preparedContent = $seoService->prepareContentWithTableOfContents($post->content);
+        $relatedPosts = $post->relatedPosts()->limit(4)->get();
+        $relatedTools = $post->relatedTools()->limit(4)->get();
+        $relatedTemplates = $post->relatedTemplates()->limit(4)->get();
+
+        if ($relatedPosts->isEmpty()) {
+            $relatedPosts = Post::published()
+                ->whereKeyNot($post->getKey())
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
+
+        if ($relatedTools->isEmpty()) {
+            $relatedTools = Tool::published()
+                ->featured()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
+
+        if ($relatedTemplates->isEmpty()) {
+            $relatedTemplates = DocumentTemplate::published()
+                ->featured()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
 
         return view('blog.show', [
             'post' => $post,
             'seo' => $seoService->forModel($post),
             'toc' => $preparedContent['items'],
             'postContent' => $preparedContent['html'],
-            'relatedPosts' => $post->relatedPosts()->limit(4)->get(),
-            'relatedTools' => $post->relatedTools()->limit(4)->get(),
-            'relatedTemplates' => $post->relatedTemplates()->limit(4)->get(),
+            'relatedPosts' => $relatedPosts,
+            'relatedTools' => $relatedTools,
+            'relatedTemplates' => $relatedTemplates,
         ]);
     }
 }

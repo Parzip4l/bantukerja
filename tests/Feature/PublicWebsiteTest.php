@@ -24,6 +24,7 @@ class PublicWebsiteTest extends TestCase
             '/',
             '/tools',
             '/tools/kalkulator-thr',
+            '/tools/generator-cv-ats',
             '/template',
             '/template/surat-resign',
             '/blog',
@@ -36,6 +37,7 @@ class PublicWebsiteTest extends TestCase
             '/sitemap.xml',
             '/robots.txt',
             '/admin/login',
+            '/template/surat-resign/download.doc',
         ];
 
         foreach ($routes as $route) {
@@ -101,5 +103,65 @@ class PublicWebsiteTest extends TestCase
         $this->actingAs($editor)
             ->get('/admin/ad-slots')
             ->assertForbidden();
+    }
+
+    public function test_cv_ats_generator_can_preview_result(): void
+    {
+        $response = $this->from('/tools/generator-cv-ats')->post('/tools/generator-cv-ats/calculate', [
+            'full_name' => 'Ayu Maharani',
+            'professional_title' => 'Digital Marketing Specialist',
+            'email' => 'ayu@example.com',
+            'phone' => '08123456789',
+            'city' => 'Jakarta',
+            'linkedin' => 'https://www.linkedin.com/in/ayu-maharani',
+            'portfolio' => 'https://portfolio.example.com',
+            'summary' => 'Profesional pemasaran digital dengan pengalaman mengelola campaign berbayar, SEO, dan optimasi funnel untuk meningkatkan lead berkualitas.',
+            'skills' => 'SEO, Google Ads, Meta Ads, Copywriting',
+            'languages' => 'Indonesia, English',
+            'certifications' => "Google Ads Search Certification\nMeta Certified Digital Marketing Associate",
+            'achievements' => "Meningkatkan lead 40% dalam 6 bulan\nMenurunkan CPL 22%",
+            'work_experiences' => [
+                [
+                    'job_title' => 'Digital Marketing Specialist',
+                    'company' => 'PT Maju Bersama',
+                    'location' => 'Jakarta',
+                    'start_date' => '2022-01-01',
+                    'end_date' => '2024-12-01',
+                    'description' => "Mengelola campaign Google Ads\nOptimasi landing page\nMembuat laporan mingguan",
+                ],
+            ],
+            'educations' => [
+                [
+                    'degree' => 'S1 Ilmu Komunikasi',
+                    'institution' => 'Universitas Indonesia',
+                    'location' => 'Depok',
+                    'start_year' => 2017,
+                    'end_year' => 2021,
+                    'description' => 'Fokus pada komunikasi pemasaran dan riset konsumen.',
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect('/tools/generator-cv-ats');
+
+        $this->followRedirects($response)->assertSee('Download PDF');
+    }
+
+    public function test_related_content_sections_show_relevant_links(): void
+    {
+        $this->get('/blog/cara-menghitung-thr-karyawan')
+            ->assertOk()
+            ->assertSee('Kalkulator THR')
+            ->assertSee('CV Sederhana');
+
+        $this->get('/tools/generator-invoice')
+            ->assertOk()
+            ->assertSee('Cara membuat invoice sederhana agar tagihan terlihat profesional')
+            ->assertSee('Invoice Sederhana');
+
+        $this->get('/template/surat-resign')
+            ->assertOk()
+            ->assertSee('Contoh surat resign profesional yang tetap menjaga hubungan baik')
+            ->assertSee('Generator Surat Izin Kerja');
     }
 }
