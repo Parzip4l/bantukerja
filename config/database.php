@@ -3,6 +3,25 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+$mysqlOptions = [];
+
+if (extension_loaded('pdo_mysql')) {
+    $mysqlOptions = array_filter([
+        Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+    ]);
+
+    if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+        $mysqlOptions[PDO::MYSQL_ATTR_INIT_COMMAND] = sprintf(
+            "SET NAMES '%s' COLLATE '%s'",
+            env('DB_CHARSET', 'utf8mb4'),
+            env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+        );
+    }
+
+    $mysqlOptions[PDO::ATTR_EMULATE_PREPARES] = false;
+    $mysqlOptions[PDO::ATTR_STRINGIFY_FETCHES] = false;
+}
+
 return [
 
     /*
@@ -59,9 +78,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => $mysqlOptions,
         ],
 
         'mariadb' => [
@@ -79,9 +96,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => $mysqlOptions,
         ],
 
         'pgsql' => [
