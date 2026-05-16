@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'internal_publisher' => [
+        'token' => env('INTERNAL_PUBLISH_TOKEN'),
+    ],
+
 ];

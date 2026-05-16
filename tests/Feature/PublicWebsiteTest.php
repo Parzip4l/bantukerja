@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\ContactMessage;
 use App\Models\GeneratorDownloadLog;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,6 +16,8 @@ class PublicWebsiteTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        config()->set('services.internal_publisher.token', 'testing-internal-publisher-token');
 
         $this->seed();
     }
@@ -270,5 +273,56 @@ class PublicWebsiteTest extends TestCase
             ->assertOk()
             ->assertSee('Contoh surat resign profesional yang tetap menjaga hubungan baik')
             ->assertSee('Generator Surat Izin Kerja');
+    }
+
+    public function test_internal_post_publisher_requires_valid_token(): void
+    {
+        $this->postJson('/api/internal/posts/from-ai', [
+            'category_slug' => 'dokumen-kerja',
+            'title' => 'Artikel internal tanpa token',
+            'excerpt' => 'Percobaan publish tanpa token yang valid.',
+            'content' => '<p>Konten</p>',
+        ])->assertForbidden();
+    }
+
+    public function test_internal_post_publisher_can_create_post_and_faqs(): void
+    {
+        $response = $this->withHeaders([
+            'X-BK-Internal-Token' => 'testing-internal-publisher-token',
+        ])->postJson('/api/internal/posts/from-ai', [
+            'category_slug' => 'dokumen-kerja',
+            'title' => 'Cara menyusun SOP administrasi agar tim lebih konsisten',
+            'excerpt' => 'Panduan praktis menyusun SOP administrasi agar pekerjaan lebih konsisten dan mudah diaudit.',
+            'content' => '<h2>Pendahuluan</h2><p>Konten artikel lengkap.</p>',
+            'meta_title' => 'Cara menyusun SOP administrasi agar tim lebih konsisten',
+            'meta_description' => 'Pelajari cara menyusun SOP administrasi yang rapi, jelas, dan mudah diikuti oleh tim.',
+            'status' => 'published',
+            'faqs' => [
+                [
+                    'question' => 'Apa manfaat SOP administrasi?',
+                    'answer' => 'SOP membantu tim bekerja lebih konsisten, rapi, dan mudah dievaluasi.',
+                ],
+                [
+                    'question' => 'Apakah SOP harus panjang?',
+                    'answer' => 'Tidak. Yang penting jelas, spesifik, dan mudah dipahami oleh tim yang menjalankannya.',
+                ],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.title', 'Cara menyusun SOP administrasi agar tim lebih konsisten')
+            ->assertJsonPath('data.status', 'published')
+            ->assertJsonPath('data.faqs_count', 2);
+
+        $this->assertDatabaseHas('posts', [
+            'title' => 'Cara menyusun SOP administrasi agar tim lebih konsisten',
+            'status' => 'published',
+        ]);
+
+        $this->assertDatabaseHas('faqs', [
+            'faqable_type' => Post::class,
+            'question' => 'Apa manfaat SOP administrasi?',
+            'is_active' => true,
+        ]);
     }
 }
