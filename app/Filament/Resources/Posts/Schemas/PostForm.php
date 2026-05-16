@@ -19,9 +19,7 @@ class PostForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->columns([
-                'lg' => 3,
-            ])
+            ->columns(1)
             ->components([
                 Section::make('Konten')
                     ->description('Area editor utama dibuat lebih lebar agar penulisan artikel lebih nyaman.')
@@ -32,9 +30,6 @@ class PostForm
                             ->extraAttributes([
                                 'style' => 'min-height: 72vh;',
                             ]),
-                    ])
-                    ->columnSpan([
-                        'lg' => 2,
                     ]),
                 Section::make('Informasi artikel')
                     ->schema([
@@ -47,10 +42,7 @@ class PostForm
                         ])->required(),
                         Textarea::make('excerpt')->required()->rows(4)->columnSpanFull(),
                     ])
-                    ->columns(2)
-                    ->columnSpan([
-                        'lg' => 1,
-                    ]),
+                    ->columns(1),
                 Section::make('Media')
                     ->description('Upload gambar artikel dan OG image langsung dari panel admin.')
                     ->schema([
@@ -61,7 +53,7 @@ class PostForm
                             ->image()
                             ->imageEditor()
                             ->visibility('public')
-                            ->columnSpan(1),
+                            ->columnSpanFull(),
                         FileUpload::make('og_image')
                             ->label('OG image')
                             ->disk('uploads')
@@ -69,22 +61,16 @@ class PostForm
                             ->image()
                             ->imageEditor()
                             ->visibility('public')
-                            ->columnSpan(1),
+                            ->columnSpanFull(),
                     ])
-                    ->columns(2)
-                    ->columnSpan([
-                        'lg' => 1,
-                    ]),
+                    ->columns(1),
                 Section::make('SEO')
                     ->schema([
                         TextInput::make('meta_title')->required(),
                         Textarea::make('meta_description')->required()->rows(4)->columnSpanFull(),
                         DateTimePicker::make('published_at'),
                     ])
-                    ->columns(2)
-                    ->columnSpan([
-                        'lg' => 1,
-                    ]),
+                    ->columns(1),
                 Section::make('FAQ')
                     ->description('Pertanyaan umum untuk memperkaya SEO dan membantu pembaca.')
                     ->schema([
@@ -100,8 +86,7 @@ class PostForm
                             ->addActionLabel('Tambah FAQ')
                             ->grid(2)
                             ->columnSpanFull(),
-                    ])
-                    ->columnSpanFull(),
+                    ]),
             ]);
     }
 }
