@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+    @production
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXVJ08TTEP"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+            gtag('config', 'G-YXVJ08TTEP');
+        </script>
+    @endproduction
     <x-seo :seo="$seo ?? []" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('structured-data')
