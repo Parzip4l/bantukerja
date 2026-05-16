@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\GeneratorTemplate;
+use App\Models\GeneratorDownloadLog;
 use App\Models\Tool;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -32,44 +34,75 @@ class DocumentGeneratorService
 
     public function preview(string $generatorType, array $payload, ?string $templateSlug): array
     {
-        $template = $this->templateService->findTemplate($generatorType, $templateSlug);
-        $document = $this->normalizePayload($generatorType, $payload);
+        $documentState = $this->compose($generatorType, $payload, $templateSlug);
 
         return [
             'generator_type' => $generatorType,
-            'template' => $template,
-            'template_slug' => $template->slug,
-            'payload' => $document,
-            'html' => $this->renderPreviewHtml($generatorType, $template, $document),
-            'copy_text' => $this->copyText($generatorType, $document),
-            'file_name' => $this->buildFilename($generatorType, $document),
+            'template' => $documentState['template'],
+            'template_slug' => $documentState['template_slug'],
+            'payload' => $documentState['payload'],
+            'html' => $this->renderPreviewHtml($generatorType, $documentState['template'], $documentState['payload']),
+            'copy_text' => $documentState['copy_text'],
+            'file_name' => $documentState['file_name'],
         ];
     }
 
     public function downloadPdf(string $generatorType, array $payload, ?string $templateSlug)
     {
-        $template = $this->templateService->findTemplate($generatorType, $templateSlug);
-        $document = $this->normalizePayload($generatorType, $payload);
+        $documentState = $this->compose($generatorType, $payload, $templateSlug);
 
         return Pdf::loadView('generators.pdf', [
-            'template' => $template,
-            'templateView' => $this->templateService->resolveViewPath($template),
-            'document' => $document,
+            'template' => $documentState['template'],
+            'templateView' => $this->templateService->resolveViewPath($documentState['template']),
+            'document' => $documentState['payload'],
         ])
-            ->setPaper($template->paper_size ?: 'a4', $template->orientation ?: 'portrait')
-            ->download($this->buildFilename($generatorType, $document));
+            ->setPaper($documentState['template']->paper_size ?: 'a4', $documentState['template']->orientation ?: 'portrait')
+            ->download($documentState['file_name']);
     }
 
     public function printView(string $generatorType, array $payload, ?string $templateSlug): Response
     {
+        $documentState = $this->compose($generatorType, $payload, $templateSlug);
+
+        return response()->view('generators.print', [
+            'template' => $documentState['template'],
+            'templateView' => $this->templateService->resolveViewPath($documentState['template']),
+            'document' => $documentState['payload'],
+            'title' => $this->documentTitle($generatorType, $documentState['payload']),
+        ]);
+    }
+
+    public function compose(string $generatorType, array $payload, ?string $templateSlug): array
+    {
         $template = $this->templateService->findTemplate($generatorType, $templateSlug);
         $document = $this->normalizePayload($generatorType, $payload);
 
-        return response()->view('generators.print', [
+        return [
             'template' => $template,
-            'templateView' => $this->templateService->resolveViewPath($template),
-            'document' => $document,
-            'title' => $this->documentTitle($generatorType, $document),
+            'template_slug' => $template->slug,
+            'payload' => $document,
+            'copy_text' => $this->copyText($generatorType, $document),
+            'file_name' => $this->buildFilename($generatorType, $document),
+        ];
+    }
+
+    public function logAction(Request $request, string $generatorType, ?string $templateSlug, string $action): void
+    {
+        if (! in_array($action, ['preview', 'download_pdf', 'print', 'copy'], true)) {
+            return;
+        }
+
+        GeneratorDownloadLog::query()->create([
+            'generator_type' => $generatorType,
+            'template_slug' => $templateSlug,
+            'action' => $action,
+            'ip_hash' => filled($request->ip())
+                ? hash('sha256', config('app.key').'|'.$request->ip())
+                : null,
+            'user_agent_hash' => filled($request->userAgent())
+                ? hash('sha256', config('app.key').'|'.$request->userAgent())
+                : null,
+            'created_at' => now(),
         ]);
     }
 
@@ -93,6 +126,32 @@ class DocumentGeneratorService
                 filled($payload['position']) ? (string) $payload['position'] : '',
                 filled($payload['company']) ? (string) $payload['company'] : '',
             ]),
+            'receipt' => implode("\n", array_filter([
+                'KWITANSI',
+                filled($payload['receipt_number'] ?? null) ? 'Nomor: '.$payload['receipt_number'] : null,
+                filled($payload['city'] ?? null) ? $payload['city'].', '.($payload['receipt_date_label'] ?? $payload['receipt_date']) : ($payload['receipt_date_label'] ?? $payload['receipt_date']),
+                'Sudah terima dari: '.($payload['payer_name'] ?? '-'),
+                'Jumlah: '.($payload['amount_label'] ?? '-'),
+                'Untuk pembayaran: '.($payload['description'] ?? '-'),
+                filled($payload['payment_method'] ?? null) ? 'Metode pembayaran: '.$payload['payment_method'] : null,
+                filled($payload['notes'] ?? null) ? 'Catatan: '.$payload['notes'] : null,
+                '',
+                'Penerima,',
+                '',
+                (string) ($payload['receiver_name'] ?? ''),
+            ])),
+            'minutes' => implode("\n", array_filter([
+                strtoupper((string) ($payload['title'] ?? 'BERITA ACARA')),
+                filled($payload['document_number'] ?? null) ? 'Nomor: '.$payload['document_number'] : null,
+                filled($payload['location'] ?? null) ? 'Lokasi: '.$payload['location'] : null,
+                filled($payload['event_date_label'] ?? null) ? 'Tanggal: '.$payload['event_date_label'] : null,
+                '',
+                $payload['opening'] ?? null,
+                '',
+                $payload['content'] ?? null,
+                '',
+                $payload['closing'] ?? null,
+            ])),
             default => null,
         };
     }
@@ -122,6 +181,8 @@ class DocumentGeneratorService
         return match ($generatorType) {
             'invoice' => $this->normalizeInvoicePayload($payload),
             'letter' => $this->normalizeLetterPayload($payload),
+            'receipt' => $this->normalizeReceiptPayload($payload),
+            'minutes' => $this->normalizeMinutesPayload($payload),
             default => $payload,
         };
     }
@@ -181,13 +242,39 @@ class DocumentGeneratorService
         ]);
     }
 
+    protected function normalizeReceiptPayload(array $payload): array
+    {
+        $receiptDate = $payload['receipt_date'] ?? null;
+
+        return array_merge($payload, [
+            'receipt_date_label' => $receiptDate ? Carbon::parse($receiptDate)->translatedFormat('d F Y') : null,
+            'amount_label' => 'Rp '.number_format((float) ($payload['amount'] ?? 0), 0, ',', '.'),
+        ]);
+    }
+
+    protected function normalizeMinutesPayload(array $payload): array
+    {
+        $eventDate = $payload['event_date'] ?? null;
+
+        return array_merge($payload, [
+            'event_date_label' => $eventDate ? Carbon::parse($eventDate)->translatedFormat('d F Y') : null,
+            'content_paragraphs' => collect(preg_split("/\r\n|\n|\r/", (string) ($payload['content'] ?? '')))
+                ->map(fn (string $line): string => trim($line))
+                ->filter()
+                ->values()
+                ->all(),
+            'opening' => trim((string) ($payload['opening'] ?? '')),
+            'closing' => trim((string) ($payload['closing'] ?? 'Demikian berita acara ini dibuat untuk dipergunakan sebagaimana mestinya.')),
+        ]);
+    }
+
     protected function buildFilename(string $generatorType, array $document): string
     {
         return match ($generatorType) {
             'invoice' => 'invoice-'.Str::slug((string) ($document['invoice_number'] ?? 'dokumen')).'-bantukerja.pdf',
             'letter' => 'surat-izin-bantukerja.pdf',
-            'receipt' => 'kwitansi-bantukerja.pdf',
-            'minutes' => 'berita-acara-bantukerja.pdf',
+            'receipt' => 'kwitansi-'.Str::slug((string) ($document['receipt_number'] ?? $document['payer_name'] ?? 'bantukerja')).'.pdf',
+            'minutes' => 'berita-acara-'.Str::slug((string) ($document['title'] ?? 'bantukerja')).'.pdf',
             default => 'dokumen-bantukerja.pdf',
         };
     }

@@ -23,4 +23,9 @@ class GeneratorDownloadLog extends Model
             'created_at' => 'datetime',
         ];
     }
+
+    public function scopeForGeneratorType($query, string $generatorType)
+    {
+        return $query->where('generator_type', $generatorType);
+    }
 }

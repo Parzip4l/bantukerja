@@ -3,17 +3,29 @@
 namespace App\Services;
 
 use App\Models\GeneratorTemplate;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 
 class GeneratorTemplateService
 {
-    public function getTemplatesFor(string $generatorType)
+    public function getTemplatesFor(string $generatorType): Collection
     {
-        return GeneratorTemplate::query()
+        if (! $this->hasTemplatesTable()) {
+            return collect([$this->getDefaultTemplate($generatorType)]);
+        }
+
+        $templates = GeneratorTemplate::query()
             ->active()
             ->forType($generatorType)
             ->free()
             ->ordered()
             ->get();
+
+        if ($templates->isNotEmpty()) {
+            return $templates;
+        }
+
+        return collect([$this->getDefaultTemplate($generatorType)]);
     }
 
     public function findTemplate(string $generatorType, ?string $templateSlug): GeneratorTemplate
@@ -44,14 +56,16 @@ class GeneratorTemplateService
 
     public function getDefaultTemplate(string $generatorType): GeneratorTemplate
     {
-        $template = GeneratorTemplate::query()
-            ->active()
-            ->forType($generatorType)
-            ->ordered()
-            ->first();
+        if ($this->hasTemplatesTable()) {
+            $template = GeneratorTemplate::query()
+                ->active()
+                ->forType($generatorType)
+                ->ordered()
+                ->first();
 
-        if ($template) {
-            return $this->ensureResolvable($generatorType, $template);
+            if ($template) {
+                return $this->ensureResolvable($generatorType, $template);
+            }
         }
 
         return new GeneratorTemplate([
@@ -89,5 +103,12 @@ class GeneratorTemplateService
             'minutes' => 'generators.minutes.templates.formal',
             default => 'generators.letter.templates.simple',
         };
+    }
+
+    protected function hasTemplatesTable(): bool
+    {
+        static $exists;
+
+        return $exists ??= Schema::hasTable('generator_templates');
     }
 }
