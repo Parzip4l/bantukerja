@@ -11,6 +11,10 @@ class SitemapService
 {
     protected function pageUrl(Page $page): string
     {
+        if (! filled($page->slug)) {
+            return route('home');
+        }
+
         return match ($page->slug) {
             'about' => route('pages.about'),
             'contact' => route('pages.contact'),

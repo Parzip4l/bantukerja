@@ -30,6 +30,9 @@ class Page extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('is_published', true);
+        return $query
+            ->where('is_published', true)
+            ->whereNotNull('slug')
+            ->where('slug', '<>', '');
     }
 }

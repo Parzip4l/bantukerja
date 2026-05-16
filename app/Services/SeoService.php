@@ -33,11 +33,19 @@ class SeoService
         $title = $model->meta_title ?: $model->title;
         $description = $model->meta_description
             ?: Str::limit(strip_tags($model->short_description ?? $model->excerpt ?? $model->content ?? ''), 160);
+        $pageCanonical = match ($model->slug) {
+            'about' => route('pages.about'),
+            'contact' => route('pages.contact'),
+            'privacy-policy' => route('pages.privacy-policy'),
+            'terms' => route('pages.terms'),
+            'disclaimer' => route('pages.disclaimer'),
+            default => filled($model->slug) ? route('pages.show', $model->slug) : url()->current(),
+        };
         $canonical = match (true) {
-            $model instanceof Tool => route('tools.show', $model->slug),
-            $model instanceof DocumentTemplate => route('templates.show', $model->slug),
-            $model instanceof Post => route('blog.show', $model->slug),
-            $model instanceof Page => route('pages.show', $model->slug),
+            $model instanceof Tool => filled($model->slug) ? route('tools.show', $model->slug) : url()->current(),
+            $model instanceof DocumentTemplate => filled($model->slug) ? route('templates.show', $model->slug) : url()->current(),
+            $model instanceof Post => filled($model->slug) ? route('blog.show', $model->slug) : url()->current(),
+            $model instanceof Page => $pageCanonical,
             default => url()->current(),
         };
 
