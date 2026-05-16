@@ -30,21 +30,23 @@
 
         <div class="mt-8 grid gap-6 lg:grid-cols-2">
             @forelse ($posts as $post)
-                <a href="{{ route('blog.show', $post->slug) }}" class="card-panel overflow-hidden hover:border-blue-200">
-                    @if (MediaUrl::resolve($post->featured_image))
-                        <img
-                            src="{{ MediaUrl::resolve($post->featured_image) }}"
-                            alt="{{ $post->title }}"
-                            class="h-56 w-full object-cover"
-                            loading="lazy"
-                        >
-                    @endif
-                    <div class="p-6">
-                        <p class="text-sm font-medium text-slate-500">{{ $post->category?->name }}</p>
-                        <h2 class="mt-3 text-2xl font-semibold text-slate-900">{{ $post->title }}</h2>
-                        <p class="mt-3 text-sm leading-7 text-slate-600">{{ $post->excerpt }}</p>
-                    </div>
-                </a>
+                @if (filled($post->slug))
+                    <a href="{{ route('blog.show', $post->slug) }}" class="card-panel overflow-hidden hover:border-blue-200">
+                        @if (MediaUrl::resolve($post->featured_image))
+                            <img
+                                src="{{ MediaUrl::resolve($post->featured_image) }}"
+                                alt="{{ $post->title }}"
+                                class="h-56 w-full object-cover"
+                                loading="lazy"
+                            >
+                        @endif
+                        <div class="p-6">
+                            <p class="text-sm font-medium text-slate-500">{{ $post->category?->name }}</p>
+                            <h2 class="mt-3 text-2xl font-semibold text-slate-900">{{ $post->title }}</h2>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">{{ $post->excerpt }}</p>
+                        </div>
+                    </a>
+                @endif
             @empty
                 <div class="card-panel p-8 text-sm text-slate-600 lg:col-span-2">Belum ada artikel yang cocok dengan pencarian Anda.</div>
             @endforelse

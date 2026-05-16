@@ -60,7 +60,9 @@
                     <h2 class="text-2xl font-semibold text-slate-900">Artikel terkait</h2>
                     <div class="mt-5 grid gap-4 md:grid-cols-2">
                         @foreach ($relatedPosts as $relatedPost)
-                            <a href="{{ route('blog.show', $relatedPost->slug) }}" class="rounded-2xl border border-slate-200 p-5 text-sm leading-7 text-slate-700 hover:border-blue-200">{{ $relatedPost->title }}</a>
+                            @if (filled($relatedPost->slug))
+                                <a href="{{ route('blog.show', $relatedPost->slug) }}" class="rounded-2xl border border-slate-200 p-5 text-sm leading-7 text-slate-700 hover:border-blue-200">{{ $relatedPost->title }}</a>
+                            @endif
                         @endforeach
                     </div>
                 </section>

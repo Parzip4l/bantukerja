@@ -141,11 +141,13 @@
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             @foreach ($latestPosts as $post)
-                <a href="{{ route('blog.show', $post->slug) }}" class="card-panel p-6 hover:-translate-y-0.5 hover:border-blue-200">
-                    <p class="text-sm font-medium text-slate-500">{{ $post->category?->name }}</p>
-                    <h3 class="mt-3 text-xl font-semibold text-slate-900">{{ $post->title }}</h3>
-                    <p class="mt-3 text-sm leading-7 text-slate-600">{{ $post->excerpt }}</p>
-                </a>
+                @if (filled($post->slug))
+                    <a href="{{ route('blog.show', $post->slug) }}" class="card-panel p-6 hover:-translate-y-0.5 hover:border-blue-200">
+                        <p class="text-sm font-medium text-slate-500">{{ $post->category?->name }}</p>
+                        <h3 class="mt-3 text-xl font-semibold text-slate-900">{{ $post->title }}</h3>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">{{ $post->excerpt }}</p>
+                    </a>
+                @endif
             @endforeach
         </div>
     </section>
