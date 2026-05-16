@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete()->index();
+            $table->foreignId('category_id')->nullable()->index();
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('excerpt');
@@ -22,6 +22,11 @@ return new class extends Migration
             $table->enum('status', ['draft', 'published'])->default('draft')->index();
             $table->timestamp('published_at')->nullable()->index();
             $table->timestamps();
+
+            $table->foreign('category_id', 'posts_category_id_foreign')
+                ->references('id')
+                ->on('categories')
+                ->nullOnDelete();
         });
     }
 

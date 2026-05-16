@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('tools', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete()->index();
+            $table->foreignId('category_id')->nullable()->index();
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('short_description');
@@ -24,6 +24,11 @@ return new class extends Migration
             $table->boolean('is_published')->default(false)->index();
             $table->timestamp('published_at')->nullable()->index();
             $table->timestamps();
+
+            $table->foreign('category_id', 'tools_category_id_foreign')
+                ->references('id')
+                ->on('categories')
+                ->nullOnDelete();
         });
     }
 
