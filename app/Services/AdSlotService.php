@@ -11,10 +11,18 @@ class AdSlotService
     public function getSlot(string $key): ?AdSlot
     {
         $payload = Cache::remember("ad-slot:{$key}", now()->addMinutes(10), function () use ($key): ?array {
-            return AdSlot::query()
+            $slot = AdSlot::query()
                 ->where('key', $key)
                 ->active()
-                ->first()?->toArray();
+                ->first();
+
+            if (! $slot) {
+                return null;
+            }
+
+            // Use raw attributes so broken timestamp strings in production data
+            // do not trigger Carbon parsing during array serialization.
+            return $slot->getAttributes();
         });
 
         if (! is_array($payload)) {
