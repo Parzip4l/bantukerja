@@ -15,6 +15,19 @@
         'author' => ['@type' => 'Organization', 'name' => 'BantuKerja.online'],
         'publisher' => ['@type' => 'Organization', 'name' => 'BantuKerja.online'],
     ];
+
+    $faqSchema = $post->faqs->isNotEmpty() ? [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => $post->faqs->map(fn ($faq) => [
+            '@type' => 'Question',
+            'name' => $faq->question,
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => $faq->answer,
+            ],
+        ])->all(),
+    ] : null;
 @endphp
 
 @section('content')
@@ -55,6 +68,20 @@
                 <div class="mt-6">
                     <x-ad-slot slot-key="article_middle" label="Article Middle" />
                 </div>
+
+                @if ($post->faqs->isNotEmpty())
+                    <section class="mt-6 card-panel p-7">
+                        <h2 class="text-2xl font-semibold text-slate-900">FAQ</h2>
+                        <div class="mt-5 space-y-4">
+                            @foreach ($post->faqs as $faq)
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+                                    <h3 class="text-base font-semibold text-slate-900">{{ $faq->question }}</h3>
+                                    <p class="mt-3 text-sm leading-7 text-slate-600">{{ $faq->answer }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
 
                 <section class="mt-6 card-panel p-7">
                     <h2 class="text-2xl font-semibold text-slate-900">Artikel terkait</h2>
@@ -114,6 +141,11 @@
             <script type="application/ld+json">
                 {!! json_encode($articleSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
             </script>
+            @if ($faqSchema)
+                <script type="application/ld+json">
+                    {!! json_encode($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+                </script>
+            @endif
         @endpush
     </section>
 @endsection

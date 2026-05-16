@@ -47,7 +47,7 @@ class DocumentTemplate extends Model
 
     public function faqs(): MorphMany
     {
-        return $this->morphMany(Faq::class, 'faqable')->orderBy('sort_order');
+        return $this->morphMany(Faq::class, 'faqable')->active()->orderBy('sort_order');
     }
 
     public function relatedPosts()
