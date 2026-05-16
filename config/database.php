@@ -18,8 +18,12 @@ if (extension_loaded('pdo_mysql')) {
         );
     }
 
-    $mysqlOptions[PDO::ATTR_EMULATE_PREPARES] = false;
+    $mysqlOptions[PDO::ATTR_EMULATE_PREPARES] = true;
     $mysqlOptions[PDO::ATTR_STRINGIFY_FETCHES] = false;
+
+    if (defined('PDO::MYSQL_ATTR_DIRECT_QUERY')) {
+        $mysqlOptions[PDO::MYSQL_ATTR_DIRECT_QUERY] = true;
+    }
 }
 
 return [
