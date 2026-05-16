@@ -80,6 +80,8 @@ class Post extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query
+            ->whereNotNull('slug')
+            ->where('slug', '<>', '')
             ->where('status', 'published')
             ->where(function (Builder $builder): void {
                 $builder->whereNull('published_at')

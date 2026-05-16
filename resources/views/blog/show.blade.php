@@ -82,7 +82,9 @@
                     <h2 class="text-lg font-semibold text-slate-900">Tools terkait</h2>
                     <div class="mt-4 space-y-4">
                         @foreach ($relatedTools as $tool)
-                            <a href="{{ route('tools.show', $tool->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $tool->title }}</a>
+                            @if (filled($tool->slug))
+                                <a href="{{ route('tools.show', $tool->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $tool->title }}</a>
+                            @endif
                         @endforeach
                     </div>
                 </div>

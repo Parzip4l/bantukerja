@@ -71,6 +71,8 @@ class DocumentTemplate extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query
+            ->whereNotNull('slug')
+            ->where('slug', '<>', '')
             ->where('is_published', true)
             ->where(function (Builder $builder): void {
                 $builder->whereNull('published_at')

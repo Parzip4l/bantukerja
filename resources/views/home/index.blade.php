@@ -93,11 +93,13 @@
 
         <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             @foreach ($popularTools as $tool)
-                <a href="{{ route('tools.show', $tool->slug) }}" class="card-panel p-6 hover:-translate-y-0.5 hover:border-blue-200">
-                    <p class="text-sm font-medium text-blue-700">{{ $tool->category?->name }}</p>
-                    <h3 class="mt-3 text-xl font-semibold text-slate-900">{{ $tool->title }}</h3>
-                    <p class="mt-3 text-sm leading-7 text-slate-600">{{ $tool->short_description }}</p>
-                </a>
+                @if (filled($tool->slug))
+                    <a href="{{ route('tools.show', $tool->slug) }}" class="card-panel p-6 hover:-translate-y-0.5 hover:border-blue-200">
+                        <p class="text-sm font-medium text-blue-700">{{ $tool->category?->name }}</p>
+                        <h3 class="mt-3 text-xl font-semibold text-slate-900">{{ $tool->title }}</h3>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">{{ $tool->short_description }}</p>
+                    </a>
+                @endif
             @endforeach
         </div>
     </section>
