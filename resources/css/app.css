@@ -43,7 +43,7 @@
     }
 
     .card-panel {
-        @apply rounded-3xl border border-slate-200 bg-white shadow-sm;
+        @apply rounded-[1.5rem] border border-slate-200 bg-white shadow-sm sm:rounded-3xl;
     }
 
     .section-heading {
@@ -69,7 +69,7 @@
     .prose-content p,
     .prose-content ul,
     .prose-content ol {
-        @apply mt-4 leading-8;
+        @apply mt-4 leading-7 sm:leading-8;
     }
 
     .prose-content ul {

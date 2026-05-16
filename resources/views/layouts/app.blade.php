@@ -12,12 +12,12 @@
 <body>
     <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.10),_transparent_32%),linear-gradient(to_bottom,_#f8fafc,_#ffffff)]">
         <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur">
-            <div class="container-shell flex items-center justify-between gap-4 py-4">
+            <div class="container-shell flex items-center justify-between gap-4 py-3 sm:py-4">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     <img
                         src="{{ asset('images/bantukerja-logo.png') }}"
                         alt="BantuKerja.online"
-                        class="h-12 w-auto rounded-2xl object-contain"
+                        class="h-10 w-auto rounded-2xl object-contain sm:h-12"
                         loading="eager"
                     >
                 </a>
@@ -30,6 +30,16 @@
                     <a href="{{ route('pages.contact') }}" class="hover:text-blue-700">Contact</a>
                 </nav>
             </div>
+
+            <div class="border-t border-slate-200/70 bg-white/95 md:hidden">
+                <div class="container-shell -mx-4 flex gap-2 overflow-x-auto px-4 py-3 text-sm font-medium text-slate-600 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    <a href="{{ route('tools.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Tools</a>
+                    <a href="{{ route('templates.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Template</a>
+                    <a href="{{ route('blog.index') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Blog</a>
+                    <a href="{{ route('pages.about') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">About</a>
+                    <a href="{{ route('pages.contact') }}" class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:border-blue-200 hover:text-blue-700">Contact</a>
+                </div>
+            </div>
         </header>
 
         <main>
@@ -37,19 +47,19 @@
         </main>
 
         <footer class="mt-20">
-            <div class="container-shell py-14 sm:py-16">
-                <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.08),_transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.08),_transparent_22%),linear-gradient(180deg,_#ffffff,_#f8fafc)] p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] lg:p-10">
-                    <div class="grid gap-12 lg:grid-cols-[minmax(0,1.25fr),minmax(0,0.8fr),minmax(0,0.8fr)] lg:gap-10">
+            <div class="container-shell py-12 sm:py-16">
+                <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.08),_transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.08),_transparent_22%),linear-gradient(180deg,_#ffffff,_#f8fafc)] p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
+                    <div class="grid gap-10 lg:grid-cols-[minmax(0,1.25fr),minmax(0,0.8fr),minmax(0,0.8fr)] lg:gap-10">
                         <div>
                             <a href="{{ route('home') }}" class="inline-flex items-center gap-4">
                                 <img
                                     src="{{ asset('images/bantukerja-logo.png') }}"
                                     alt="BantuKerja.online"
-                                    class="h-14 w-auto rounded-2xl border border-slate-200 bg-white p-1.5 object-contain shadow-sm"
+                                    class="h-12 w-auto rounded-2xl border border-slate-200 bg-white p-1.5 object-contain shadow-sm sm:h-14"
                                     loading="lazy"
                                 >
                             </a>
-                            <p class="mt-6 max-w-xl text-sm leading-8 text-slate-600">
+                            <p class="mt-5 max-w-xl text-sm leading-7 text-slate-600 sm:mt-6 sm:leading-8">
                                 Platform utilitas publik untuk membantu kerja, bisnis, dan administrasi harian terasa lebih cepat, lebih rapi, dan lebih mudah dikelola.
                             </p>
                         </div>
@@ -75,8 +85,8 @@
                         </div>
                     </div>
 
-                    <div class="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-4 mt-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="mt-4">&copy; {{ now()->year }} BantuKerja.online. Semua hak cipta dilindungi.</p>
+                    <div class="mt-8 border-t border-slate-200 pt-5 text-sm text-slate-500">
+                        <p>&copy; {{ now()->year }} BantuKerja.online. Semua hak cipta dilindungi.</p>
                     </div>
                 </div>
             </div>
