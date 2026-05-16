@@ -27,6 +27,8 @@ class PublicWebsiteTest extends TestCase
             '/tools/kalkulator-fee-konsultan-pajak',
             '/tools/kalkulator-fee-accounting-service',
             '/tools/kalkulator-fee-audit',
+            '/tools/generator-invoice',
+            '/tools/generator-surat-izin',
             '/tools/generator-cv-ats',
             '/template',
             '/template/surat-resign',
@@ -74,6 +76,36 @@ class PublicWebsiteTest extends TestCase
         $this->followRedirects($response)
             ->assertSee('Estimasi fee 5%')
             ->assertSee('Revenue perusahaan');
+    }
+
+    public function test_invoice_generator_shows_template_cards(): void
+    {
+        $this->get('/tools/generator-invoice')
+            ->assertOk()
+            ->assertSee('Pilih Template Desain Invoice')
+            ->assertSee('Classic')
+            ->assertSee('Modern');
+    }
+
+    public function test_letter_generator_can_preview_document_template(): void
+    {
+        $response = $this->from('/tools/generator-surat-izin')->post('/tools/generator-surat-izin/preview', [
+            'template_slug' => 'letter-formal',
+            'name' => 'Rizky Firmansyah',
+            'position' => 'Staff Operasional',
+            'company' => 'PT Bantu Kerja Sejahtera',
+            'date' => '2026-05-16',
+            'city' => 'Jakarta',
+            'recipient' => 'HRD',
+            'reason' => 'Perlu izin satu hari untuk keperluan keluarga yang tidak dapat ditinggalkan.',
+        ]);
+
+        $response->assertRedirect('/tools/generator-surat-izin');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Surat')
+            ->assertSee('Surat Izin Kerja')
+            ->assertSee('Rizky Firmansyah');
     }
 
     public function test_admin_user_can_access_filament_resources(): void

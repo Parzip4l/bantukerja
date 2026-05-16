@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CategorySeeder::class,
+            GeneratorTemplateSeeder::class,
             ToolSeeder::class,
             DocumentTemplateSeeder::class,
             PostSeeder::class,

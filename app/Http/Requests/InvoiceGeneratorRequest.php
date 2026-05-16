@@ -32,6 +32,7 @@ class InvoiceGeneratorRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'template_slug' => ['nullable', 'string', 'max:150'],
             'business_logo' => ['nullable', 'image', 'max:2048'],
             'business_logo_path' => ['nullable', 'string', 'max:255'],
             'business_name' => ['required', 'string', 'max:150'],
@@ -50,7 +51,7 @@ class InvoiceGeneratorRequest extends FormRequest
             'due_date' => ['nullable', 'date', 'after_or_equal:invoice_date'],
             'po_number' => ['nullable', 'string', 'max:100'],
             'currency' => ['nullable', 'string', 'max:10'],
-            'items' => ['required', 'array', 'min:1'],
+            'items' => ['required', 'array', 'min:1', 'max:30'],
             'items.*.name' => ['required', 'string', 'max:150'],
             'items.*.description' => ['nullable', 'string', 'max:500'],
             'items.*.unit' => ['nullable', 'string', 'max:50'],

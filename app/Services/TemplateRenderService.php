@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TemplateRenderService
@@ -69,7 +68,7 @@ class TemplateRenderService
 
     public function storePublicUpload(UploadedFile $file, string $directory): string
     {
-        return $file->store($directory, 'public');
+        return $file->store($directory, 'uploads');
     }
 
     public function publicUrl(?string $path): ?string
@@ -78,7 +77,7 @@ class TemplateRenderService
             return null;
         }
 
-        return Storage::disk('public')->url($path);
+        return url('uploads/'.ltrim($path, '/'));
     }
 
     public function publicStoragePath(?string $path): ?string
@@ -87,6 +86,6 @@ class TemplateRenderService
             return null;
         }
 
-        return storage_path('app/public/'.$path);
+        return public_path('uploads/'.ltrim($path, '/'));
     }
 }

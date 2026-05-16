@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\GeneratorController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SeoController;
@@ -19,13 +20,19 @@ Route::post('/tools/kalkulator-lembur/calculate', [ToolController::class, 'calcu
 Route::post('/tools/kalkulator-fee-konsultan-pajak/calculate', [ToolController::class, 'calculateTaxConsultantFee'])->middleware('throttle:20,1')->name('tools.tax-consultant-fee.calculate');
 Route::post('/tools/kalkulator-fee-accounting-service/calculate', [ToolController::class, 'calculateAccountingServiceFee'])->middleware('throttle:20,1')->name('tools.accounting-service-fee.calculate');
 Route::post('/tools/kalkulator-fee-audit/calculate', [ToolController::class, 'calculateAuditFee'])->middleware('throttle:20,1')->name('tools.audit-fee.calculate');
-Route::post('/tools/generator-invoice/calculate', [ToolController::class, 'calculateInvoice'])->middleware('throttle:20,1')->name('tools.invoice.calculate');
-Route::post('/tools/generator-invoice/pdf', [ToolController::class, 'invoicePdf'])->middleware('throttle:10,1')->name('tools.invoice.pdf');
+Route::post('/tools/generator-invoice/calculate', [GeneratorController::class, 'previewInvoice'])->middleware('throttle:20,1')->name('tools.invoice.calculate');
+Route::post('/tools/generator-invoice/preview', [GeneratorController::class, 'previewInvoice'])->middleware('throttle:20,1')->name('tools.invoice.preview');
+Route::post('/tools/generator-invoice/pdf', [GeneratorController::class, 'downloadInvoice'])->middleware('throttle:10,1')->name('tools.invoice.pdf');
+Route::post('/tools/generator-invoice/download', [GeneratorController::class, 'downloadInvoice'])->middleware('throttle:10,1')->name('tools.invoice.download');
+Route::post('/tools/generator-invoice/print', [GeneratorController::class, 'printInvoice'])->middleware('throttle:10,1')->name('tools.invoice.print');
 Route::post('/tools/generator-cv-ats/calculate', [ToolController::class, 'calculateCvAts'])->middleware('throttle:20,1')->name('tools.cv-ats.calculate');
 Route::post('/tools/generator-cv-ats/pdf', [ToolController::class, 'cvAtsPdf'])->middleware('throttle:10,1')->name('tools.cv-ats.pdf');
 Route::post('/tools/generator-cv-ats/word', [ToolController::class, 'cvAtsWord'])->middleware('throttle:10,1')->name('tools.cv-ats.word');
-Route::post('/tools/generator-surat-izin/calculate', [ToolController::class, 'calculateLeaveLetter'])->middleware('throttle:20,1')->name('tools.leave-letter.calculate');
-Route::post('/tools/generator-surat-izin/download', [ToolController::class, 'downloadLeaveLetter'])->middleware('throttle:10,1')->name('tools.leave-letter.download');
+Route::post('/tools/generator-surat-izin/calculate', [GeneratorController::class, 'previewLetter'])->middleware('throttle:20,1')->name('tools.leave-letter.calculate');
+Route::post('/tools/generator-surat-izin/preview', [GeneratorController::class, 'previewLetter'])->middleware('throttle:20,1')->name('tools.leave-letter.preview');
+Route::post('/tools/generator-surat-izin/download', [GeneratorController::class, 'downloadLetterText'])->middleware('throttle:10,1')->name('tools.leave-letter.download');
+Route::post('/tools/generator-surat-izin/pdf', [GeneratorController::class, 'downloadLetterPdf'])->middleware('throttle:10,1')->name('tools.leave-letter.pdf');
+Route::post('/tools/generator-surat-izin/print', [GeneratorController::class, 'printLetter'])->middleware('throttle:10,1')->name('tools.leave-letter.print');
 
 Route::get('/template', [TemplateController::class, 'index'])->name('templates.index');
 Route::get('/template/{slug}', [TemplateController::class, 'show'])->name('templates.show');

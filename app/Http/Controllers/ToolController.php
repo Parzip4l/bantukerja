@@ -14,6 +14,8 @@ use App\Models\Category;
 use App\Models\DocumentTemplate;
 use App\Models\Post;
 use App\Models\Tool;
+use App\Services\DocumentGeneratorService;
+use App\Services\GeneratorTemplateService;
 use App\Services\SeoService;
 use App\Services\TemplateRenderService;
 use App\Services\ToolCalculationService;
@@ -51,8 +53,12 @@ class ToolController extends Controller
         ]);
     }
 
-    public function show(string $slug, SeoService $seoService): View
-    {
+    public function show(
+        string $slug,
+        SeoService $seoService,
+        GeneratorTemplateService $generatorTemplateService,
+        DocumentGeneratorService $documentGeneratorService,
+    ): View {
         $tool = Tool::query()
             ->with(['category', 'faqs'])
             ->published()
@@ -76,11 +82,32 @@ class ToolController extends Controller
                 ->get();
         }
 
+        $generatorType = $documentGeneratorService->generatorTypeForTool($tool);
+        $generatorTemplates = collect();
+        $generatorPreview = null;
+
+        if ($generatorType) {
+            $generatorTemplates = $generatorTemplateService->getTemplatesFor($generatorType);
+
+            $previewSession = session('generator_preview');
+
+            if (($previewSession['tool_slug'] ?? null) === $tool->slug) {
+                $generatorPreview = $documentGeneratorService->preview(
+                    $previewSession['generator_type'] ?? $generatorType,
+                    $previewSession['payload'] ?? [],
+                    $previewSession['template_slug'] ?? null,
+                );
+            }
+        }
+
         return view('tools.show', [
             'tool' => $tool,
             'seo' => $seoService->forModel($tool),
             'relatedPosts' => $relatedPosts,
             'relatedTemplates' => $relatedTemplates,
+            'generatorType' => $generatorType,
+            'generatorTemplates' => $generatorTemplates,
+            'generatorPreview' => $generatorPreview,
         ]);
     }
 

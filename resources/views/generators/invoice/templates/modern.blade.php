@@ -1,0 +1,64 @@
+<div style="margin: 0 auto; max-width: 820px; border-radius: 24px; overflow: hidden; border: 1px solid #dbeafe; font-family: DejaVu Sans, sans-serif; color: #0f172a;">
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%); padding: 28px; color: #ffffff;">
+        <div style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.78;">Invoice</div>
+        <div style="margin-top: 10px; font-size: 28px; font-weight: 700;">{{ $document['invoice_number'] }}</div>
+        <div style="margin-top: 10px; font-size: 13px;">{{ $document['business_name'] }}</div>
+    </div>
+
+    <div style="padding: 28px;">
+        <div style="display: table; width: 100%; margin-bottom: 24px;">
+            <div style="display: table-cell; width: 54%; vertical-align: top; padding-right: 14px;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: #64748b;">Bill to</div>
+                <div style="margin-top: 8px; font-size: 18px; font-weight: 700;">{{ $document['customer_name'] }}</div>
+                <div style="margin-top: 8px; font-size: 12px; line-height: 1.8; color: #475569;">{{ $document['customer_address'] }}</div>
+            </div>
+            <div style="display: table-cell; width: 46%; vertical-align: top; text-align: right;">
+                <div style="font-size: 12px; color: #475569;">Tanggal: {{ $document['invoice_date_label'] }}</div>
+                <div style="margin-top: 6px; font-size: 12px; color: #475569;">Jatuh tempo: {{ $document['due_date_label'] ?? '-' }}</div>
+                <div style="margin-top: 14px; display: inline-block; border-radius: 999px; background: #fff7ed; padding: 8px 14px; color: #c2410c; font-size: 11px; font-weight: 700;">Total {{ $document['formatted_grand_total'] }}</div>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <thead>
+                <tr style="background: #eff6ff;">
+                    <th style="padding: 12px 10px; text-align: left;">Item</th>
+                    <th style="padding: 12px 10px; text-align: left;">Qty</th>
+                    <th style="padding: 12px 10px; text-align: left;">Harga</th>
+                    <th style="padding: 12px 10px; text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($document['items'] as $item)
+                    <tr>
+                        <td style="border-bottom: 1px solid #e2e8f0; padding: 12px 10px;">
+                            <div style="font-weight: 700;">{{ $item['name'] }}</div>
+                            @if ($item['description'])
+                                <div style="margin-top: 4px; color: #64748b;">{{ $item['description'] }}</div>
+                            @endif
+                        </td>
+                        <td style="border-bottom: 1px solid #e2e8f0; padding: 12px 10px;">{{ $item['qty'] }}</td>
+                        <td style="border-bottom: 1px solid #e2e8f0; padding: 12px 10px;">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+                        <td style="border-bottom: 1px solid #e2e8f0; padding: 12px 10px; text-align: right;">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div style="margin-top: 24px; display: table; width: 100%;">
+            <div style="display: table-cell; width: 55%; vertical-align: top; padding-right: 14px;">
+                @if (! empty($document['notes']))
+                    <div style="font-size: 12px; color: #475569; line-height: 1.8;">{{ $document['notes'] }}</div>
+                @endif
+            </div>
+            <div style="display: table-cell; width: 45%; vertical-align: top;">
+                <div style="border-radius: 20px; background: #f8fafc; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;"><span>Subtotal</span><strong>{{ $document['formatted_subtotal'] }}</strong></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;"><span>Pajak</span><strong>{{ $document['formatted_tax_amount'] }}</strong></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px;"><span>Diskon</span><strong>{{ $document['formatted_discount_amount'] }}</strong></div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px solid #cbd5e1; padding-top: 12px; font-size: 16px; color: #1d4ed8;"><span>Total</span><strong>{{ $document['formatted_grand_total'] }}</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

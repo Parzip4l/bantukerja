@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
+    <meta name="google-adsense-account" content="ca-pub-8003898120453466">
     <title>{{ $title }}</title>
     <style>
         body { font-family: Arial, sans-serif; color: #0f172a; font-size: 12pt; line-height: 1.6; }
