@@ -16,6 +16,9 @@ Route::get('/tools/{slug}', [ToolController::class, 'show'])->name('tools.show')
 Route::post('/tools/kalkulator-thr/calculate', [ToolController::class, 'calculateThr'])->middleware('throttle:20,1')->name('tools.thr.calculate');
 Route::post('/tools/kalkulator-gaji-bersih/calculate', [ToolController::class, 'calculateSalary'])->middleware('throttle:20,1')->name('tools.salary.calculate');
 Route::post('/tools/kalkulator-lembur/calculate', [ToolController::class, 'calculateOvertime'])->middleware('throttle:20,1')->name('tools.overtime.calculate');
+Route::post('/tools/kalkulator-fee-konsultan-pajak/calculate', [ToolController::class, 'calculateTaxConsultantFee'])->middleware('throttle:20,1')->name('tools.tax-consultant-fee.calculate');
+Route::post('/tools/kalkulator-fee-accounting-service/calculate', [ToolController::class, 'calculateAccountingServiceFee'])->middleware('throttle:20,1')->name('tools.accounting-service-fee.calculate');
+Route::post('/tools/kalkulator-fee-audit/calculate', [ToolController::class, 'calculateAuditFee'])->middleware('throttle:20,1')->name('tools.audit-fee.calculate');
 Route::post('/tools/generator-invoice/calculate', [ToolController::class, 'calculateInvoice'])->middleware('throttle:20,1')->name('tools.invoice.calculate');
 Route::post('/tools/generator-invoice/pdf', [ToolController::class, 'invoicePdf'])->middleware('throttle:10,1')->name('tools.invoice.pdf');
 Route::post('/tools/generator-cv-ats/calculate', [ToolController::class, 'calculateCvAts'])->middleware('throttle:20,1')->name('tools.cv-ats.calculate');

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Concerns\NormalizesCurrencyInput;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ThrCalculatorRequest extends FormRequest
+class AuditFeeRequest extends FormRequest
 {
     use NormalizesCurrencyInput;
 
@@ -17,16 +17,16 @@ class ThrCalculatorRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'monthly_salary' => $this->normalizeCurrencyValue($this->input('monthly_salary')),
+            'total_assets' => $this->normalizeCurrencyValue($this->input('total_assets')),
+            'company_revenue' => $this->normalizeCurrencyValue($this->input('company_revenue')),
         ]);
     }
 
     public function rules(): array
     {
         return [
-            'monthly_salary' => ['required', 'numeric', 'min:0'],
-            'months_worked' => ['required', 'integer', 'min:0', 'max:600'],
-            'employee_status' => ['nullable', 'string', 'max:100'],
+            'total_assets' => ['required', 'numeric', 'min:0'],
+            'company_revenue' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

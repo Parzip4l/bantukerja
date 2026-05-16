@@ -62,6 +62,54 @@ class ToolCalculationService
         ];
     }
 
+    public function calculateProfessionalServiceFee(
+        ?float $transactionValue,
+        ?float $companyRevenue,
+        string $basisType,
+        float $percentage = 5,
+    ): array {
+        $transactionValue = $transactionValue ?? 0;
+        $companyRevenue = $companyRevenue ?? 0;
+
+        [$basisLabel, $basisAmount] = match ($basisType) {
+            'transaction' => ['Nilai transaksi', $transactionValue],
+            'revenue' => ['Revenue perusahaan', $companyRevenue],
+            default => $transactionValue >= $companyRevenue
+                ? ['Nilai transaksi terbesar', $transactionValue]
+                : ['Revenue perusahaan terbesar', $companyRevenue],
+        };
+
+        $feeAmount = $basisAmount * ($percentage / 100);
+
+        return [
+            'transaction_value' => round($transactionValue, 2),
+            'company_revenue' => round($companyRevenue, 2),
+            'basis_type' => $basisType,
+            'basis_label' => $basisLabel,
+            'basis_amount' => round($basisAmount, 2),
+            'percentage' => $percentage,
+            'fee_amount' => round($feeAmount, 2),
+            'explanation' => "Fee dihitung {$percentage}% dari {$basisLabel} yang dipilih sebagai dasar perhitungan.",
+        ];
+    }
+
+    public function calculateAuditFee(float $totalAssets, float $companyRevenue, float $percentage = 5): array
+    {
+        $basisAmount = max($totalAssets, $companyRevenue);
+        $basisLabel = $totalAssets >= $companyRevenue ? 'Total aset' : 'Revenue perusahaan';
+        $feeAmount = $basisAmount * ($percentage / 100);
+
+        return [
+            'total_assets' => round($totalAssets, 2),
+            'company_revenue' => round($companyRevenue, 2),
+            'basis_label' => $basisLabel,
+            'basis_amount' => round($basisAmount, 2),
+            'percentage' => $percentage,
+            'fee_amount' => round($feeAmount, 2),
+            'explanation' => "Untuk audit, dasar hitung diambil dari nilai yang lebih besar antara total aset dan revenue perusahaan, lalu dikalikan {$percentage}%.",
+        ];
+    }
+
     public function calculateInvoiceTotal(array $items, float $tax = 0, float $discount = 0): array
     {
         $normalizedItems = collect($items)

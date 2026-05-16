@@ -51,7 +51,7 @@
                                 @csrf
                                 <div class="sm:col-span-2">
                                     <label class="mb-2 block text-sm font-medium text-slate-700">Gaji bulanan</label>
-                                    <input type="number" step="0.01" name="monthly_salary" value="{{ old('monthly_salary') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4">
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="monthly_salary" value="{{ old('monthly_salary') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="8.000.000">
                                 </div>
                                 <div>
                                     <label class="mb-2 block text-sm font-medium text-slate-700">Lama bekerja (bulan)</label>
@@ -77,7 +77,7 @@
                                 ] as $field => $label)
                                     <div>
                                         <label class="mb-2 block text-sm font-medium text-slate-700">{{ $label }}</label>
-                                        <input type="number" step="0.01" name="{{ $field }}" value="{{ old($field) }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4">
+                                        <input type="text" inputmode="numeric" data-rupiah-input name="{{ $field }}" value="{{ old($field) }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="0">
                                     </div>
                                 @endforeach
                                 <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white sm:col-span-2">Hitung gaji bersih</button>
@@ -89,7 +89,7 @@
                                 @csrf
                                 <div>
                                     <label class="mb-2 block text-sm font-medium text-slate-700">Upah bulanan</label>
-                                    <input type="number" step="0.01" name="monthly_wage" value="{{ old('monthly_wage') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4">
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="monthly_wage" value="{{ old('monthly_wage') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="5.000.000">
                                 </div>
                                 <div>
                                     <label class="mb-2 block text-sm font-medium text-slate-700">Jumlah jam lembur</label>
@@ -103,6 +103,67 @@
                                     </select>
                                 </div>
                                 <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white sm:col-span-2">Hitung lembur</button>
+                            </form>
+                        @break
+
+                        @case('kalkulator-fee-konsultan-pajak')
+                            <form method="post" action="{{ route('tools.tax-consultant-fee.calculate') }}" class="grid gap-4 sm:grid-cols-2">
+                                @csrf
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Nilai transaksi</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="transaction_value" value="{{ old('transaction_value') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="250.000.000">
+                                </div>
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Revenue perusahaan</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="company_revenue" value="{{ old('company_revenue') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="500.000.000">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Dasar hitung fee</label>
+                                    <select name="basis_type" class="h-12 w-full rounded-2xl border border-slate-200 px-4">
+                                        <option value="transaction" @selected(old('basis_type', 'highest') === 'transaction')>Ambil dari transaksi</option>
+                                        <option value="revenue" @selected(old('basis_type', 'highest') === 'revenue')>Ambil dari revenue</option>
+                                        <option value="highest" @selected(old('basis_type', 'highest') === 'highest')>Ambil nilai terbesar</option>
+                                    </select>
+                                </div>
+                                <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white sm:col-span-2">Hitung fee konsultan pajak</button>
+                            </form>
+                        @break
+
+                        @case('kalkulator-fee-accounting-service')
+                            <form method="post" action="{{ route('tools.accounting-service-fee.calculate') }}" class="grid gap-4 sm:grid-cols-2">
+                                @csrf
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Nilai transaksi</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="transaction_value" value="{{ old('transaction_value') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="250.000.000">
+                                </div>
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Revenue perusahaan</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="company_revenue" value="{{ old('company_revenue') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="500.000.000">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Dasar hitung fee</label>
+                                    <select name="basis_type" class="h-12 w-full rounded-2xl border border-slate-200 px-4">
+                                        <option value="transaction" @selected(old('basis_type', 'highest') === 'transaction')>Ambil dari transaksi</option>
+                                        <option value="revenue" @selected(old('basis_type', 'highest') === 'revenue')>Ambil dari revenue</option>
+                                        <option value="highest" @selected(old('basis_type', 'highest') === 'highest')>Ambil nilai terbesar</option>
+                                    </select>
+                                </div>
+                                <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white sm:col-span-2">Hitung fee accounting service</button>
+                            </form>
+                        @break
+
+                        @case('kalkulator-fee-audit')
+                            <form method="post" action="{{ route('tools.audit-fee.calculate') }}" class="grid gap-4 sm:grid-cols-2">
+                                @csrf
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Total aset</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="total_assets" value="{{ old('total_assets') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="1.000.000.000">
+                                </div>
+                                <div>
+                                    <label class="mb-2 block text-sm font-medium text-slate-700">Revenue perusahaan</label>
+                                    <input type="text" inputmode="numeric" data-rupiah-input name="company_revenue" value="{{ old('company_revenue') }}" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="850.000.000">
+                                </div>
+                                <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white sm:col-span-2">Hitung fee audit</button>
                             </form>
                         @break
 
@@ -215,7 +276,7 @@
                                                     <input type="text" name="items[{{ $index }}][name]" value="{{ $item['name'] ?? '' }}" placeholder="Nama item / layanan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
                                                     <input type="text" name="items[{{ $index }}][unit]" value="{{ $item['unit'] ?? '' }}" placeholder="Unit" class="h-12 rounded-2xl border border-slate-200 px-4">
                                                     <input type="number" step="0.01" name="items[{{ $index }}][qty]" value="{{ $item['qty'] ?? '' }}" placeholder="Qty" class="h-12 rounded-2xl border border-slate-200 px-4">
-                                                    <input type="number" step="0.01" name="items[{{ $index }}][price]" value="{{ $item['price'] ?? '' }}" placeholder="Harga satuan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
+                                                <input type="text" inputmode="numeric" data-rupiah-input name="items[{{ $index }}][price]" value="{{ $item['price'] ?? '' }}" placeholder="Harga satuan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
                                                     <textarea name="items[{{ $index }}][description]" rows="2" placeholder="Deskripsi item (opsional)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 lg:col-span-4">{{ $item['description'] ?? '' }}</textarea>
                                                 </div>
                                             </div>
@@ -231,7 +292,7 @@
                                                 <input type="text" name="items[__INDEX__][name]" placeholder="Nama item / layanan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
                                                 <input type="text" name="items[__INDEX__][unit]" placeholder="Unit" class="h-12 rounded-2xl border border-slate-200 px-4">
                                                 <input type="number" step="0.01" name="items[__INDEX__][qty]" placeholder="Qty" class="h-12 rounded-2xl border border-slate-200 px-4">
-                                                <input type="number" step="0.01" name="items[__INDEX__][price]" placeholder="Harga satuan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
+                                                <input type="text" inputmode="numeric" data-rupiah-input name="items[__INDEX__][price]" placeholder="Harga satuan" class="h-12 rounded-2xl border border-slate-200 px-4 lg:col-span-2">
                                                 <textarea name="items[__INDEX__][description]" rows="2" placeholder="Deskripsi item (opsional)" class="w-full rounded-2xl border border-slate-200 px-4 py-3 lg:col-span-4"></textarea>
                                             </div>
                                         </div>
@@ -474,6 +535,21 @@
                                 <div class="rounded-2xl bg-blue-50 p-4"><p class="text-sm text-blue-700">Total lembur</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['overtime_total'], 0, ',', '.') }}</p></div>
                             </div>
                             <p class="mt-4 text-sm leading-7 text-slate-600">{{ $result['data']['note'] }}</p>
+                        @elseif (in_array($result['type'], ['tax-consultant-fee', 'accounting-service-fee'], true))
+                            <p class="mt-4 text-sm leading-7 text-slate-600">{{ $result['data']['explanation'] }}</p>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                                <div class="rounded-2xl bg-slate-100 p-4"><p class="text-sm text-slate-500">Dasar hitung</p><p class="mt-2 font-semibold">{{ $result['data']['basis_label'] }}</p></div>
+                                <div class="rounded-2xl bg-slate-100 p-4"><p class="text-sm text-slate-500">Nilai acuan</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['basis_amount'], 0, ',', '.') }}</p></div>
+                                <div class="rounded-2xl bg-blue-50 p-4"><p class="text-sm text-blue-700">Estimasi fee 5%</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['fee_amount'], 0, ',', '.') }}</p></div>
+                            </div>
+                        @elseif ($result['type'] === 'audit-fee')
+                            <p class="mt-4 text-sm leading-7 text-slate-600">{{ $result['data']['explanation'] }}</p>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-4">
+                                <div class="rounded-2xl bg-slate-100 p-4"><p class="text-sm text-slate-500">Total aset</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['total_assets'], 0, ',', '.') }}</p></div>
+                                <div class="rounded-2xl bg-slate-100 p-4"><p class="text-sm text-slate-500">Revenue</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['company_revenue'], 0, ',', '.') }}</p></div>
+                                <div class="rounded-2xl bg-slate-100 p-4"><p class="text-sm text-slate-500">Basis terpilih</p><p class="mt-2 font-semibold">{{ $result['data']['basis_label'] }}</p></div>
+                                <div class="rounded-2xl bg-blue-50 p-4"><p class="text-sm text-blue-700">Estimasi fee 5%</p><p class="mt-2 font-semibold">Rp {{ number_format($result['data']['fee_amount'], 0, ',', '.') }}</p></div>
+                            </div>
                         @elseif ($result['type'] === 'invoice')
                             <div class="mt-5 rounded-3xl border border-slate-200 p-6">
                                 <div class="flex flex-wrap items-start justify-between gap-6">

@@ -24,6 +24,9 @@ class PublicWebsiteTest extends TestCase
             '/',
             '/tools',
             '/tools/kalkulator-thr',
+            '/tools/kalkulator-fee-konsultan-pajak',
+            '/tools/kalkulator-fee-accounting-service',
+            '/tools/kalkulator-fee-audit',
             '/tools/generator-cv-ats',
             '/template',
             '/template/surat-resign',
@@ -56,6 +59,21 @@ class PublicWebsiteTest extends TestCase
         $response->assertRedirect('/tools/kalkulator-thr');
 
         $this->followRedirects($response)->assertSee('Estimasi THR');
+    }
+
+    public function test_tax_consultant_fee_calculator_can_preview_result(): void
+    {
+        $response = $this->from('/tools/kalkulator-fee-konsultan-pajak')->post('/tools/kalkulator-fee-konsultan-pajak/calculate', [
+            'transaction_value' => 250000000,
+            'company_revenue' => 400000000,
+            'basis_type' => 'revenue',
+        ]);
+
+        $response->assertRedirect('/tools/kalkulator-fee-konsultan-pajak');
+
+        $this->followRedirects($response)
+            ->assertSee('Estimasi fee 5%')
+            ->assertSee('Revenue perusahaan');
     }
 
     public function test_admin_user_can_access_filament_resources(): void

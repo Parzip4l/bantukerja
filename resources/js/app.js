@@ -143,6 +143,47 @@ const initializeMobileMenu = () => {
     });
 };
 
+const initializeRupiahInputs = () => {
+    const formatRupiah = (value) => {
+        const digits = String(value ?? '').replace(/[^\d]/g, '');
+
+        if (!digits) {
+            return '';
+        }
+
+        return new Intl.NumberFormat('id-ID').format(Number.parseInt(digits, 10));
+    };
+
+    const applyFormatting = (input) => {
+        input.value = formatRupiah(input.value);
+    };
+
+    document.addEventListener('input', (event) => {
+        const input = event.target.closest('[data-rupiah-input]');
+
+        if (!input) {
+            return;
+        }
+
+        applyFormatting(input);
+    });
+
+    document.addEventListener('blur', (event) => {
+        const input = event.target.closest('[data-rupiah-input]');
+
+        if (!input) {
+            return;
+        }
+
+        applyFormatting(input);
+    }, true);
+
+    document.querySelectorAll('[data-rupiah-input]').forEach((input) => {
+        applyFormatting(input);
+    });
+};
+
 copyToClipboard();
 initializeRepeaters();
 initializeMobileMenu();
+initializeRupiahInputs();

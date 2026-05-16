@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuditFeeRequest;
 use App\Http\Requests\CvAtsGeneratorRequest;
 use App\Http\Requests\InvoiceGeneratorRequest;
 use App\Http\Requests\LeaveLetterGeneratorRequest;
 use App\Http\Requests\OvertimeCalculatorRequest;
+use App\Http\Requests\ProfessionalServiceFeeRequest;
 use App\Http\Requests\SalaryCalculatorRequest;
 use App\Http\Requests\ThrCalculatorRequest;
 use App\Models\Category;
@@ -116,6 +118,47 @@ class ToolController extends Controller
                 (float) $request->input('monthly_wage'),
                 (float) $request->input('hours'),
                 $request->string('day_type')->toString(),
+            ),
+        ]);
+    }
+
+    public function calculateTaxConsultantFee(
+        ProfessionalServiceFeeRequest $request,
+        ToolCalculationService $service,
+    ): RedirectResponse {
+        return back()->withInput()->with('tool_result', [
+            'type' => 'tax-consultant-fee',
+            'data' => $service->calculateProfessionalServiceFee(
+                $request->filled('transaction_value') ? (float) $request->input('transaction_value') : null,
+                $request->filled('company_revenue') ? (float) $request->input('company_revenue') : null,
+                $request->string('basis_type')->toString(),
+            ),
+        ]);
+    }
+
+    public function calculateAccountingServiceFee(
+        ProfessionalServiceFeeRequest $request,
+        ToolCalculationService $service,
+    ): RedirectResponse {
+        return back()->withInput()->with('tool_result', [
+            'type' => 'accounting-service-fee',
+            'data' => $service->calculateProfessionalServiceFee(
+                $request->filled('transaction_value') ? (float) $request->input('transaction_value') : null,
+                $request->filled('company_revenue') ? (float) $request->input('company_revenue') : null,
+                $request->string('basis_type')->toString(),
+            ),
+        ]);
+    }
+
+    public function calculateAuditFee(
+        AuditFeeRequest $request,
+        ToolCalculationService $service,
+    ): RedirectResponse {
+        return back()->withInput()->with('tool_result', [
+            'type' => 'audit-fee',
+            'data' => $service->calculateAuditFee(
+                (float) $request->input('total_assets'),
+                (float) $request->input('company_revenue'),
             ),
         ]);
     }

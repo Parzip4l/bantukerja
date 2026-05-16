@@ -2,13 +2,31 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\NormalizesCurrencyInput;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InvoiceGeneratorRequest extends FormRequest
 {
+    use NormalizesCurrencyInput;
+
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $items = collect($this->input('items', []))
+            ->map(function (array $item): array {
+                $item['price'] = $this->normalizeCurrencyValue($item['price'] ?? null);
+
+                return $item;
+            })
+            ->all();
+
+        $this->merge([
+            'items' => $items,
+        ]);
     }
 
     public function rules(): array
