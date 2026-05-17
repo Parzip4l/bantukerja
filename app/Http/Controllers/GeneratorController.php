@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ApplicationLetterGeneratorRequest;
 use App\Http\Requests\InvoiceGeneratorRequest;
+use App\Http\Requests\JobDescriptionGeneratorRequest;
 use App\Http\Requests\LetterGeneratorRequest;
 use App\Http\Requests\MinutesGeneratorRequest;
+use App\Http\Requests\QuotationGeneratorRequest;
 use App\Http\Requests\ReceiptGeneratorRequest;
+use App\Http\Requests\SopGeneratorRequest;
 use App\Services\DocumentGeneratorService;
 use App\Services\TemplateRenderService;
 use Illuminate\Http\RedirectResponse;
@@ -197,6 +201,241 @@ class GeneratorController extends Controller
         );
     }
 
+    public function previewApplicationLetter(
+        ApplicationLetterGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse(
+            $request,
+            $documentGeneratorService,
+            'generator-surat-lamaran-kerja',
+            'application-letter',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadApplicationLetter(
+        ApplicationLetterGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse(
+            $request,
+            $documentGeneratorService,
+            'application-letter',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function printApplicationLetter(
+        ApplicationLetterGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse(
+            $request,
+            $documentGeneratorService,
+            'application-letter',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadApplicationLetterText(
+        ApplicationLetterGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse(
+            $request,
+            $documentGeneratorService,
+            $templateRenderService,
+            'application-letter',
+            $request->validated(),
+            $request->input('template_slug'),
+            'surat-lamaran-kerja-bantukerja.txt',
+        );
+    }
+
+    public function previewQuotation(
+        QuotationGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ): RedirectResponse {
+        $payload = $this->quotationPayload($request, $templateRenderService);
+
+        return $this->previewResponse(
+            $request,
+            $documentGeneratorService,
+            'generator-quotation',
+            'quotation',
+            $payload,
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadQuotation(
+        QuotationGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $payload = $this->quotationPayload($request, $templateRenderService);
+
+        return $this->downloadPdfResponse(
+            $request,
+            $documentGeneratorService,
+            'quotation',
+            $payload,
+            $request->input('template_slug'),
+        );
+    }
+
+    public function printQuotation(
+        QuotationGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $payload = $this->quotationPayload($request, $templateRenderService);
+
+        return $this->printResponse(
+            $request,
+            $documentGeneratorService,
+            'quotation',
+            $payload,
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadQuotationText(
+        QuotationGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $payload = $this->quotationPayload($request, $templateRenderService);
+
+        return $this->downloadTextResponse(
+            $request,
+            $documentGeneratorService,
+            $templateRenderService,
+            'quotation',
+            $payload,
+            $request->input('template_slug'),
+            'quotation-ringkasan-bantukerja.txt',
+        );
+    }
+
+    public function previewSop(
+        SopGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse(
+            $request,
+            $documentGeneratorService,
+            'generator-sop',
+            'sop',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadSop(
+        SopGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse(
+            $request,
+            $documentGeneratorService,
+            'sop',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function printSop(
+        SopGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse(
+            $request,
+            $documentGeneratorService,
+            'sop',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadSopText(
+        SopGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse(
+            $request,
+            $documentGeneratorService,
+            $templateRenderService,
+            'sop',
+            $request->validated(),
+            $request->input('template_slug'),
+            'sop-bantukerja.txt',
+        );
+    }
+
+    public function previewJobDescription(
+        JobDescriptionGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse(
+            $request,
+            $documentGeneratorService,
+            'generator-job-description',
+            'job-description',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadJobDescription(
+        JobDescriptionGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse(
+            $request,
+            $documentGeneratorService,
+            'job-description',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function printJobDescription(
+        JobDescriptionGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse(
+            $request,
+            $documentGeneratorService,
+            'job-description',
+            $request->validated(),
+            $request->input('template_slug'),
+        );
+    }
+
+    public function downloadJobDescriptionText(
+        JobDescriptionGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse(
+            $request,
+            $documentGeneratorService,
+            $templateRenderService,
+            'job-description',
+            $request->validated(),
+            $request->input('template_slug'),
+            'job-description-bantukerja.txt',
+        );
+    }
+
     protected function invoicePayload(
         InvoiceGeneratorRequest $request,
         TemplateRenderService $templateRenderService,
@@ -206,6 +445,20 @@ class GeneratorController extends Controller
         if ($request->hasFile('business_logo')) {
             $payload['business_logo_path'] = $templateRenderService
                 ->storePublicUpload($request->file('business_logo'), 'tool-uploads/invoices/logos');
+        }
+
+        return $payload;
+    }
+
+    protected function quotationPayload(
+        QuotationGeneratorRequest $request,
+        TemplateRenderService $templateRenderService,
+    ): array {
+        $payload = $request->safe()->except(['vendor_logo']);
+
+        if ($request->hasFile('vendor_logo')) {
+            $payload['vendor_logo_path'] = $templateRenderService
+                ->storePublicUpload($request->file('vendor_logo'), 'tool-uploads/quotations/logos');
         }
 
         return $payload;

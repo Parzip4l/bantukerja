@@ -63,6 +63,7 @@ class ToolController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
         $relatedPosts = $tool->relatedPosts()->limit(4)->get();
+        $relatedTools = $tool->relatedTools()->limit(4)->get();
         $relatedTemplates = $tool->relatedTemplates()->limit(4)->get();
 
         if ($relatedPosts->isEmpty()) {
@@ -74,6 +75,15 @@ class ToolController extends Controller
 
         if ($relatedTemplates->isEmpty()) {
             $relatedTemplates = DocumentTemplate::published()
+                ->featured()
+                ->latestPublished()
+                ->limit(4)
+                ->get();
+        }
+
+        if ($relatedTools->isEmpty()) {
+            $relatedTools = Tool::published()
+                ->where('id', '<>', $tool->id)
                 ->featured()
                 ->latestPublished()
                 ->limit(4)
@@ -102,6 +112,7 @@ class ToolController extends Controller
             'tool' => $tool,
             'seo' => $seoService->forModel($tool),
             'relatedPosts' => $relatedPosts,
+            'relatedTools' => $relatedTools,
             'relatedTemplates' => $relatedTemplates,
             'generatorType' => $generatorType,
             'generatorTemplates' => $generatorTemplates,

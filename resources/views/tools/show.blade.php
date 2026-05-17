@@ -171,6 +171,22 @@
                             @include('tools.generators.invoice')
                         @break
 
+                        @case('generator-surat-lamaran-kerja')
+                            @include('tools.generators.application-letter')
+                        @break
+
+                        @case('generator-quotation')
+                            @include('tools.generators.quotation')
+                        @break
+
+                        @case('generator-sop')
+                            @include('tools.generators.sop')
+                        @break
+
+                        @case('generator-job-description')
+                            @include('tools.generators.job-description')
+                        @break
+
                         @case('generator-kwitansi')
                             @include('tools.generators.receipt')
                         @break
@@ -696,6 +712,16 @@
                         @foreach ($relatedPosts as $post)
                             @if (filled($post->slug))
                                 <a href="{{ route('blog.show', $post->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $post->title }}</a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+                <div class="card-panel p-6">
+                    <h2 class="text-lg font-semibold text-slate-900">Tools terkait</h2>
+                    <div class="mt-4 space-y-4">
+                        @foreach ($relatedTools as $relatedTool)
+                            @if (filled($relatedTool->slug))
+                                <a href="{{ route('tools.show', $relatedTool->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $relatedTool->title }}</a>
                             @endif
                         @endforeach
                     </div>

@@ -36,6 +36,10 @@ class PublicWebsiteTest extends TestCase
             '/tools/generator-kwitansi',
             '/tools/generator-berita-acara',
             '/tools/generator-cv-ats',
+            '/tools/generator-surat-lamaran-kerja',
+            '/tools/generator-quotation',
+            '/tools/generator-sop',
+            '/tools/generator-job-description',
             '/template',
             '/template/surat-resign',
             '/blog',
@@ -166,6 +170,147 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Preview Berita Acara')
             ->assertSee('Berita Acara Serah Terima Dokumen')
             ->assertSee('Rina Maharani');
+    }
+
+    public function test_application_letter_generator_can_preview_document(): void
+    {
+        $response = $this->from('/tools/generator-surat-lamaran-kerja')->post('/tools/generator-surat-lamaran-kerja/preview', [
+            'template_slug' => 'application-letter-formal',
+            'full_name' => 'Nadia Putri Pratama',
+            'email' => 'nadia@example.com',
+            'phone' => '081234567890',
+            'city' => 'Bandung',
+            'position_applied' => 'Digital Marketing Specialist',
+            'company_name' => 'PT Maju Berkembang',
+            'recruiter_name' => 'Rina',
+            'job_source' => 'LinkedIn',
+            'education_level' => 'S1 Manajemen',
+            'major' => 'Manajemen Pemasaran',
+            'experience_level' => '1-2-tahun',
+            'experience_summary' => 'Saya memiliki pengalaman membuat campaign media sosial, optimasi iklan digital, serta analisis performa konten untuk meningkatkan leads.',
+            'main_skills' => 'SEO, Google Ads, Canva, Copywriting',
+            'letter_type' => 'formal',
+            'language_style' => 'indonesia-formal',
+            'date' => '2026-05-17',
+        ]);
+
+        $response->assertRedirect('/tools/generator-surat-lamaran-kerja');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Surat Lamaran')
+            ->assertSee('Nadia Putri Pratama')
+            ->assertSee('PT Maju Berkembang');
+    }
+
+    public function test_quotation_generator_can_preview_document(): void
+    {
+        $response = $this->from('/tools/generator-quotation')->post('/tools/generator-quotation/preview', [
+            'template_slug' => 'quotation-professional',
+            'vendor_name' => 'Studio Maju Digital',
+            'vendor_address' => 'Bandung',
+            'vendor_email' => 'hello@studio.com',
+            'vendor_phone' => '081234567890',
+            'client_name' => 'PT Mapan Sejahtera',
+            'client_address' => 'Jakarta',
+            'quotation_number' => 'QTN-20260517-001',
+            'quotation_date' => '2026-05-17',
+            'validity_days' => 14,
+            'quotation_title' => 'Penawaran Pembuatan Website Company Profile',
+            'project_description' => 'Pembuatan website company profile lengkap dengan halaman utama, profil, layanan, dan kontak.',
+            'items' => [
+                ['name' => 'Desain UI Website', 'description' => 'Desain 5 halaman', 'qty' => 1, 'unit' => 'paket', 'price' => 5000000, 'discount' => 0],
+                ['name' => 'Development Website', 'description' => 'Implementasi frontend dan backend', 'qty' => 1, 'unit' => 'paket', 'price' => 7000000, 'discount' => 500000],
+            ],
+            'tax_percentage' => 11,
+            'additional_fee' => 250000,
+            'payment_terms' => 'dp50-pelunasan50',
+            'additional_notes' => 'Support minor revision selama 14 hari.',
+            'terms_and_conditions' => "Harga belum termasuk domain.\nTimeline dimulai setelah DP diterima.",
+            'person_in_charge' => 'Raka Aditya',
+            'person_in_charge_title' => 'Business Development Lead',
+        ]);
+
+        $response->assertRedirect('/tools/generator-quotation');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Quotation')
+            ->assertSee('Studio Maju Digital')
+            ->assertSee('Penawaran Pembuatan Website Company Profile');
+    }
+
+    public function test_sop_generator_can_preview_document(): void
+    {
+        $response = $this->from('/tools/generator-sop')->post('/tools/generator-sop/preview', [
+            'template_slug' => 'sop-standard',
+            'sop_name' => 'SOP Penanganan Keluhan Pelanggan',
+            'document_number' => 'SOP-20260517-001',
+            'document_version' => '1.0',
+            'effective_date' => '2026-05-17',
+            'department' => 'Customer Service',
+            'prepared_by' => 'Ayu',
+            'reviewed_by' => 'Budi',
+            'approved_by' => 'Citra',
+            'objective' => 'Menjamin semua keluhan pelanggan ditangani secara cepat dan terdokumentasi.',
+            'scope' => 'Berlaku untuk seluruh keluhan yang masuk melalui WhatsApp dan email.',
+            'definitions' => "SLA: target waktu penyelesaian.\nTicket: nomor laporan pelanggan.",
+            'roles' => [
+                ['role' => 'Customer Service', 'responsibility' => 'Menerima dan mencatat keluhan awal.'],
+            ],
+            'steps' => [
+                ['name' => 'Menerima keluhan', 'description' => 'CS menerima dan memverifikasi keluhan.', 'pic' => 'Customer Service', 'output' => 'Tiket keluhan'],
+            ],
+            'related_documents' => "Form keluhan pelanggan\nTemplate update status",
+            'risk_notes' => "Data pelanggan harus dijaga kerahasiaannya",
+            'kpi' => "Waktu respon awal maksimal 15 menit",
+            'sop_type' => 'customer-service',
+        ]);
+
+        $response->assertRedirect('/tools/generator-sop');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview SOP')
+            ->assertSee('SOP Penanganan Keluhan Pelanggan')
+            ->assertSee('Customer Service');
+    }
+
+    public function test_job_description_generator_can_preview_document(): void
+    {
+        $response = $this->from('/tools/generator-job-description')->post('/tools/generator-job-description/preview', [
+            'template_slug' => 'job-description-hr',
+            'output_type' => 'internal-hr',
+            'position_name' => 'Backend Developer',
+            'department' => 'Technology',
+            'job_level' => 'staff',
+            'employment_type' => 'full-time',
+            'work_location' => 'Bandung / Hybrid',
+            'position_summary' => 'Posisi ini membangun dan memelihara layanan backend yang stabil dan scalable.',
+            'position_objective' => 'Menjamin kebutuhan fitur produk dapat dijalankan dengan backend yang aman dan andal.',
+            'reports_to' => 'Engineering Manager',
+            'direct_reports' => '',
+            'responsibilities' => [
+                ['text' => 'Mengembangkan API dan business logic aplikasi.'],
+            ],
+            'education_qualification' => 'Minimal S1 Teknik Informatika atau relevan.',
+            'minimum_experience' => 'Minimal 2 tahun pengalaman backend development.',
+            'technical_skills' => 'Laravel, PHP, MySQL, REST API, Git',
+            'soft_skills' => 'Problem solving, komunikasi, kolaboratif',
+            'tools_software' => 'Jira, Slack, GitHub',
+            'kpis' => [
+                ['text' => 'Stabilitas API di atas target SLA.'],
+            ],
+            'benefits' => "BPJS\nLaptop kerja",
+            'salary_range' => 'Rp 8.000.000 - Rp 12.000.000',
+            'additional_notes' => 'Tidak diskriminatif dan terbuka untuk kandidat dari berbagai latar belakang.',
+            'output_style' => 'formal-hr',
+            'language' => 'id',
+        ]);
+
+        $response->assertRedirect('/tools/generator-job-description');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Job Description')
+            ->assertSee('Backend Developer')
+            ->assertSee('Technology');
     }
 
     public function test_admin_user_can_access_filament_resources(): void

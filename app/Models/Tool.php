@@ -71,6 +71,16 @@ class Tool extends Model
             ->latestPublished();
     }
 
+    public function relatedTools()
+    {
+        $categorySlugs = RelatedContentMap::for($this->resolveCategorySlug())['tool'];
+
+        return static::published()
+            ->whereKeyNot($this->getKey())
+            ->whereHas('category', fn ($builder) => $builder->whereIn('slug', $categorySlugs))
+            ->latestPublished();
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query

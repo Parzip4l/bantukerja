@@ -30,6 +30,16 @@ const copyToClipboard = () => {
     });
 };
 
+const updateRepeaterLabels = (list) => {
+    Array.from(list.querySelectorAll('[data-repeater-item]')).forEach((item, index) => {
+        const label = item.querySelector('[data-repeater-title]');
+
+        if (label) {
+            label.textContent = `${label.dataset.repeaterTitle} #${index + 1}`;
+        }
+    });
+};
+
 const initializeRepeaters = () => {
     const nextIndex = (list) => {
         const indexes = Array.from(list.querySelectorAll('[name]'))
@@ -40,16 +50,6 @@ const initializeRepeaters = () => {
             .filter((index) => index >= 0);
 
         return indexes.length ? Math.max(...indexes) + 1 : 0;
-    };
-
-    const updateLabels = (list) => {
-        Array.from(list.querySelectorAll('[data-repeater-item]')).forEach((item, index) => {
-            const label = item.querySelector('[data-repeater-title]');
-
-            if (label) {
-                label.textContent = `${label.dataset.repeaterTitle} #${index + 1}`;
-            }
-        });
     };
 
     document.addEventListener('click', (event) => {
@@ -67,7 +67,7 @@ const initializeRepeaters = () => {
             const index = nextIndex(list);
             const html = template.innerHTML.replaceAll('__INDEX__', String(index));
             list.insertAdjacentHTML('beforeend', html);
-            updateLabels(list);
+            updateRepeaterLabels(list);
             return;
         }
 
@@ -89,11 +89,11 @@ const initializeRepeaters = () => {
         }
 
         item.remove();
-        updateLabels(list);
+        updateRepeaterLabels(list);
     });
 
     document.querySelectorAll('[data-repeater-list]').forEach((list) => {
-        updateLabels(list);
+        updateRepeaterLabels(list);
     });
 };
 
@@ -183,7 +183,104 @@ const initializeRupiahInputs = () => {
     });
 };
 
+const initializeGeneratorPresets = () => {
+    const fillRepeaterFromTemplate = (listSelector, templateSelector, values, key) => {
+        const list = document.querySelector(listSelector);
+        const template = document.querySelector(templateSelector);
+
+        if (!list || !template || !Array.isArray(values) || values.length === 0) {
+            return;
+        }
+
+        list.innerHTML = '';
+
+        values.forEach((value, index) => {
+            const html = template.innerHTML.replaceAll('__INDEX__', String(index));
+            list.insertAdjacentHTML('beforeend', html);
+        });
+
+        Array.from(list.querySelectorAll('[data-repeater-item]')).forEach((item, index) => {
+            Object.entries(values[index] || {}).forEach(([field, value]) => {
+                const input = item.querySelector(`[name$="[${field}]"]`);
+
+                if (input) {
+                    input.value = value;
+                }
+            });
+        });
+
+        updateRepeaterLabels(list);
+    };
+
+    const sopPresetData = document.querySelector('#sop-preset-data');
+    const sopSelect = document.querySelector('[data-sop-preset-select]');
+    const sopButton = document.querySelector('[data-sop-preset-fill]');
+
+    if (sopPresetData && sopSelect && sopButton) {
+        const presets = JSON.parse(sopPresetData.textContent || '{}');
+
+        const applySopPreset = () => {
+            const values = presets[sopSelect.value];
+
+            fillRepeaterFromTemplate('[data-sop-step-list]', '[data-repeater-template="sop-steps"]', values, 'steps');
+        };
+
+        sopButton.addEventListener('click', applySopPreset);
+        sopSelect.addEventListener('change', () => {
+            const list = document.querySelector('[data-sop-step-list]');
+            const isEffectivelyEmpty = list && list.querySelectorAll('[data-repeater-item]').length <= 1
+                && !Array.from(list.querySelectorAll('textarea, input[type="text"]')).some((field) => field.value.trim() !== '');
+
+            if (isEffectivelyEmpty) {
+                applySopPreset();
+            }
+        });
+    }
+
+    const jobPresetData = document.querySelector('#job-preset-data');
+    const jobSelect = document.querySelector('[data-job-preset-select]');
+    const jobButton = document.querySelector('[data-job-preset-fill]');
+
+    if (jobPresetData && jobSelect && jobButton) {
+        const presets = JSON.parse(jobPresetData.textContent || '{}');
+
+        const applyJobPreset = () => {
+            const preset = presets[jobSelect.value];
+
+            if (!preset) {
+                return;
+            }
+
+            document.querySelectorAll('[data-job-preset-field]').forEach((field) => {
+                const key = field.getAttribute('data-job-preset-field');
+
+                if (preset[key]) {
+                    field.value = preset[key];
+                }
+            });
+
+            fillRepeaterFromTemplate(
+                '[data-job-responsibility-list]',
+                '[data-repeater-template="job-responsibilities"]',
+                (preset.responsibilities || []).map((text) => ({ text })),
+                'responsibilities',
+            );
+
+            fillRepeaterFromTemplate(
+                '[data-job-kpi-list]',
+                '[data-repeater-template="job-kpis"]',
+                (preset.kpis || []).map((text) => ({ text })),
+                'kpis',
+            );
+        };
+
+        jobButton.addEventListener('click', applyJobPreset);
+        jobSelect.addEventListener('change', applyJobPreset);
+    }
+};
+
 copyToClipboard();
 initializeRepeaters();
 initializeMobileMenu();
 initializeRupiahInputs();
+initializeGeneratorPresets();

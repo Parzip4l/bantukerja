@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Support\DocumentFormatter;
+
 class InvoiceCalculationService
 {
     public function calculate(array $items, array $options = []): array
@@ -48,6 +50,6 @@ class InvoiceCalculationService
 
     public function formatRupiah(float $value): string
     {
-        return 'Rp '.number_format($value, 0, ',', '.');
+        return DocumentFormatter::formatCurrencyIdr($value);
     }
 }
