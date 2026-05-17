@@ -40,6 +40,12 @@ class PublicWebsiteTest extends TestCase
             '/tools/generator-quotation',
             '/tools/generator-sop',
             '/tools/generator-job-description',
+            '/tools/simulasi-pertanyaan-interview',
+            '/tools/interview-answer-star',
+            '/tools/linkedin-headline-about-generator',
+            '/tools/job-description-matcher',
+            '/tools/ats-cv-checker',
+            '/tools/generator-laporan-kerja-harian',
             '/template',
             '/template/surat-resign',
             '/blog',
@@ -322,6 +328,79 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Preview Job Description')
             ->assertSee('Backend Developer')
             ->assertSee('Technology');
+    }
+
+    public function test_interview_simulation_generator_can_preview_questions(): void
+    {
+        $response = $this->from('/tools/simulasi-pertanyaan-interview')->post('/tools/simulasi-pertanyaan-interview/preview', [
+            'template_slug' => 'interview-simulation-standard',
+            'position_applied' => 'Customer Service Staff',
+            'position_category' => 'customer-service',
+            'experience_level' => '0-1-tahun',
+            'interview_type' => 'campuran',
+            'question_count' => '10',
+            'include_tips' => 'ya',
+        ]);
+
+        $response->assertRedirect('/tools/simulasi-pertanyaan-interview');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Simulasi Interview')
+            ->assertSee('Pertanyaan Interview untuk Customer Service Staff')
+            ->assertSee('Checklist persiapan');
+    }
+
+    public function test_job_description_matcher_can_preview_analysis(): void
+    {
+        $response = $this->from('/tools/job-description-matcher')->post('/tools/job-description-matcher/preview', [
+            'template_slug' => 'jd-matcher-standard',
+            'target_position' => 'Finance Staff',
+            'job_description' => 'Membuat invoice, rekonsiliasi pembayaran, laporan keuangan, dan pengolahan data Excel.',
+            'profile_summary' => 'Lulusan akuntansi yang terbiasa mengolah data keuangan dan membuat laporan sederhana.',
+            'owned_skills' => 'Excel, invoice, rekonsiliasi, laporan keuangan',
+            'experience_summary' => 'Pernah membantu rekap invoice vendor dan laporan pembayaran saat magang.',
+            'education_level' => 'S1 Akuntansi',
+        ]);
+
+        $response->assertRedirect('/tools/job-description-matcher');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Analisis')
+            ->assertSee('Match score')
+            ->assertSee('Finance Staff');
+    }
+
+    public function test_daily_work_report_generator_can_preview_document(): void
+    {
+        $response = $this->from('/tools/generator-laporan-kerja-harian')->post('/tools/generator-laporan-kerja-harian/preview', [
+            'template_slug' => 'daily-work-report-standard',
+            'author_name' => 'Muhamad Sobirin',
+            'position' => 'Admin Operasional',
+            'division' => 'Operasional',
+            'recipient_name' => 'Ibu Rina',
+            'report_date' => '2026-05-17',
+            'report_type' => 'Laporan Harian Karyawan',
+            'output_format' => 'dokumen-formal',
+            'language_style' => 'formal',
+            'tasks' => [
+                ['task_name' => 'Rekap data absensi', 'description' => 'Merapikan rekap absensi mingguan.', 'status' => 'selesai', 'progress' => 100, 'output' => 'File rekap'],
+                ['task_name' => 'Follow up vendor', 'description' => 'Menunggu dokumen vendor.', 'status' => 'tertunda', 'progress' => 40, 'output' => 'Belum ada'],
+            ],
+            'issues' => [
+                ['issue' => 'Dokumen vendor belum lengkap', 'impact' => 'Menghambat finalisasi rekap', 'temporary_action' => 'Follow up ulang via email'],
+            ],
+            'plans' => [
+                ['plan_task' => 'Melanjutkan finalisasi rekap', 'priority' => 'tinggi'],
+            ],
+            'additional_notes' => 'Perlu koordinasi lanjutan dengan vendor.',
+        ]);
+
+        $response->assertRedirect('/tools/generator-laporan-kerja-harian');
+
+        $this->followRedirects($response)
+            ->assertSee('Preview Laporan Harian')
+            ->assertSee('Laporan Harian Karyawan')
+            ->assertSee('Rekap data absensi');
     }
 
     public function test_admin_user_can_access_filament_resources(): void

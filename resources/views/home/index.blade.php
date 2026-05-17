@@ -219,6 +219,33 @@
         </div>
     </section>
 
+    @if ($careerSpotlight->isNotEmpty())
+        <section class="container-shell py-10">
+            <div class="card-panel p-6 sm:p-7">
+                <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+                    <div>
+                        <p class="eyebrow">Karier</p>
+                        <h2 class="section-heading mt-3">Siapkan CV, interview, dan profil profesional Anda</h2>
+                        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
+                            Jika Anda sedang aktif melamar kerja, gunakan jalur cepat ini untuk merapikan CV, surat lamaran, latihan interview, sampai profil LinkedIn.
+                        </p>
+                    </div>
+                    <a href="{{ route('tools.index', ['search' => 'interview']) }}" class="text-sm font-medium text-blue-700">Lihat cluster karier</a>
+                </div>
+                <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($careerSpotlight as $tool)
+                        <a href="{{ route('tools.show', $tool->slug) }}" class="rounded-3xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-200 hover:bg-white">
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $tool->category?->name }}</p>
+                            <h3 class="mt-3 text-lg font-semibold text-slate-900">{{ $tool->title }}</h3>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit($tool->short_description, 95) }}</p>
+                            <span class="mt-4 inline-flex text-sm font-semibold text-blue-700">Gunakan sekarang</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
     <section class="container-shell py-10">
         <div class="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <div class="card-panel p-6">

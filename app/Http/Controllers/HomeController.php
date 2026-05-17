@@ -38,9 +38,13 @@ class HomeController extends Controller
             'generator-cv-ats',
             'kalkulator-thr',
             'generator-surat-lamaran-kerja',
+            'simulasi-pertanyaan-interview',
+            'interview-answer-star',
+            'ats-cv-checker',
             'generator-quotation',
             'generator-sop',
             'generator-job-description',
+            'generator-laporan-kerja-harian',
             'kalkulator-gaji-bersih',
         ];
 
@@ -66,6 +70,14 @@ class HomeController extends Controller
 
         $searchIndex = $this->buildSearchIndex($allTools, $allTemplates, $allPosts);
         $personaSections = $this->buildPersonaSections($toolLookup, $templateLookup);
+        $careerSpotlight = collect([
+            $toolLookup->get('generator-cv-ats'),
+            $toolLookup->get('generator-surat-lamaran-kerja'),
+            $toolLookup->get('simulasi-pertanyaan-interview'),
+            $toolLookup->get('interview-answer-star'),
+            $toolLookup->get('linkedin-headline-about-generator'),
+            $toolLookup->get('ats-cv-checker'),
+        ])->filter()->values();
 
         return view('home.index', [
             'seo' => $seoService->defaults([
@@ -79,6 +91,7 @@ class HomeController extends Controller
             'popularTemplates' => $popularTemplates,
             'searchIndex' => $searchIndex,
             'personaSections' => $personaSections,
+            'careerSpotlight' => $careerSpotlight,
             'stats' => [
                 ['label' => 'Tools Gratis', 'value' => number_format($allTools->count())],
                 ['label' => 'Template Dokumen', 'value' => number_format($allTemplates->count())],
@@ -143,6 +156,8 @@ class HomeController extends Controller
                 'items' => collect([
                     $makeToolItem('generator-cv-ats'),
                     $makeToolItem('generator-surat-lamaran-kerja'),
+                    $makeToolItem('simulasi-pertanyaan-interview'),
+                    $makeToolItem('ats-cv-checker'),
                     $makeTemplateItem('cv-lamaran-kerja'),
                     $makeTemplateItem('surat-lamaran-kerja'),
                 ])->filter()->values(),
@@ -167,6 +182,7 @@ class HomeController extends Controller
                     $makeToolItem('kalkulator-gaji-bersih'),
                     $makeToolItem('kalkulator-lembur'),
                     $makeToolItem('generator-job-description'),
+                    $makeToolItem('generator-laporan-kerja-harian'),
                 ])->filter()->values(),
             ],
             [

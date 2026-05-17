@@ -5,6 +5,12 @@ namespace App\Services;
 use App\Models\GeneratorDownloadLog;
 use App\Models\GeneratorTemplate;
 use App\Models\Tool;
+use App\Services\CareerTools\AtsCvCheckerService;
+use App\Services\CareerTools\InterviewQuestionService;
+use App\Services\CareerTools\JobDescriptionMatcherService;
+use App\Services\CareerTools\LinkedInProfileService;
+use App\Services\CareerTools\StarAnswerService;
+use App\Services\ProductivityTools\DailyWorkReportService;
 use App\Support\DocumentFormatter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -19,6 +25,12 @@ class DocumentGeneratorService
         protected GeneratorTemplateService $templateService,
         protected InvoiceCalculationService $invoiceCalculationService,
         protected TemplateRenderService $templateRenderService,
+        protected InterviewQuestionService $interviewQuestionService,
+        protected StarAnswerService $starAnswerService,
+        protected LinkedInProfileService $linkedInProfileService,
+        protected JobDescriptionMatcherService $jobDescriptionMatcherService,
+        protected AtsCvCheckerService $atsCvCheckerService,
+        protected DailyWorkReportService $dailyWorkReportService,
     ) {}
 
     public function generatorTypeForTool(Tool|string $tool): ?string
@@ -34,6 +46,12 @@ class DocumentGeneratorService
             'generator-quotation' => 'quotation',
             'generator-sop' => 'sop',
             'generator-job-description' => 'job-description',
+            'simulasi-pertanyaan-interview' => 'interview-simulation',
+            'interview-answer-star' => 'interview-star',
+            'linkedin-headline-about-generator' => 'linkedin-profile',
+            'job-description-matcher' => 'jd-matcher',
+            'ats-cv-checker' => 'ats-cv-checker',
+            'generator-laporan-kerja-harian' => 'daily-work-report',
             default => null,
         };
     }
@@ -164,6 +182,12 @@ class DocumentGeneratorService
             'quotation' => $this->quotationCopyText($payload),
             'sop' => $this->sopCopyText($payload),
             'job-description' => $this->jobDescriptionCopyText($payload),
+            'interview-simulation' => $this->interviewSimulationCopyText($payload),
+            'interview-star' => $this->interviewStarCopyText($payload),
+            'linkedin-profile' => $this->linkedInProfileCopyText($payload),
+            'jd-matcher' => $this->jdMatcherCopyText($payload),
+            'ats-cv-checker' => $this->atsCvCheckerCopyText($payload),
+            'daily-work-report' => $this->dailyWorkReportCopyText($payload),
             default => null,
         };
     }
@@ -189,6 +213,12 @@ class DocumentGeneratorService
             'quotation' => 'generators.quotation.preview',
             'sop' => 'generators.sop.preview',
             'job-description' => 'generators.job-description.preview',
+            'interview-simulation' => 'generators.interview-simulation.preview',
+            'interview-star' => 'generators.interview-star.preview',
+            'linkedin-profile' => 'generators.linkedin-profile.preview',
+            'jd-matcher' => 'generators.jd-matcher.preview',
+            'ats-cv-checker' => 'generators.ats-cv-checker.preview',
+            'daily-work-report' => 'generators.daily-work-report.preview',
             default => 'generators.letter.preview',
         };
     }
@@ -204,6 +234,12 @@ class DocumentGeneratorService
             'quotation' => $this->normalizeQuotationPayload($payload, $templateSlug),
             'sop' => $this->normalizeSopPayload($payload),
             'job-description' => $this->normalizeJobDescriptionPayload($payload, $templateSlug),
+            'interview-simulation' => $this->normalizeInterviewSimulationPayload($payload),
+            'interview-star' => $this->normalizeInterviewStarPayload($payload),
+            'linkedin-profile' => $this->normalizeLinkedInProfilePayload($payload),
+            'jd-matcher' => $this->normalizeJobDescriptionMatcherPayload($payload),
+            'ats-cv-checker' => $this->normalizeAtsCvCheckerPayload($payload),
+            'daily-work-report' => $this->normalizeDailyWorkReportPayload($payload),
             default => $payload,
         };
     }
@@ -514,6 +550,36 @@ class DocumentGeneratorService
         ]);
     }
 
+    protected function normalizeInterviewSimulationPayload(array $payload): array
+    {
+        return array_merge($payload, $this->interviewQuestionService->generate($payload));
+    }
+
+    protected function normalizeInterviewStarPayload(array $payload): array
+    {
+        return array_merge($payload, $this->starAnswerService->generate($payload));
+    }
+
+    protected function normalizeLinkedInProfilePayload(array $payload): array
+    {
+        return array_merge($payload, $this->linkedInProfileService->generate($payload));
+    }
+
+    protected function normalizeJobDescriptionMatcherPayload(array $payload): array
+    {
+        return array_merge($payload, $this->jobDescriptionMatcherService->analyze($payload));
+    }
+
+    protected function normalizeAtsCvCheckerPayload(array $payload): array
+    {
+        return array_merge($payload, $this->atsCvCheckerService->analyze($payload));
+    }
+
+    protected function normalizeDailyWorkReportPayload(array $payload): array
+    {
+        return array_merge($payload, $this->dailyWorkReportService->generate($payload));
+    }
+
     protected function applicationLetterCopyText(array $payload): string
     {
         if ($payload['is_email_mode'] ?? false) {
@@ -603,6 +669,83 @@ class DocumentGeneratorService
         ]));
     }
 
+    protected function interviewSimulationCopyText(array $payload): string
+    {
+        $questions = collect($payload['questions'] ?? [])->map(
+            fn (array $item): string => ($item['number'] ?? '-').'. ['.($item['category'] ?? 'Interview').'] '.($item['question'] ?? '')
+                .(filled($item['tip'] ?? null) ? "\nTip: ".$item['tip'] : '')
+        )->implode("\n\n");
+
+        return implode("\n\n", array_filter([
+            'SIMULASI PERTANYAAN INTERVIEW',
+            'Posisi: '.($payload['position_applied'] ?? ''),
+            'Kategori: '.($payload['position_category_label'] ?? ''),
+            'Jenis interview: '.($payload['interview_type_label'] ?? ''),
+            $questions,
+        ]));
+    }
+
+    protected function interviewStarCopyText(array $payload): string
+    {
+        return implode("\n\n", array_filter([
+            'JAWABAN INTERVIEW METODE STAR',
+            'Pertanyaan: '.($payload['question'] ?? ''),
+            'Situation: '.($payload['star_sections']['Situation'] ?? ''),
+            'Task: '.($payload['star_sections']['Task'] ?? ''),
+            'Action: '.($payload['star_sections']['Action'] ?? ''),
+            'Result: '.($payload['star_sections']['Result'] ?? ''),
+            'Versi paragraf:',
+            $payload['paragraph_answer'] ?? '',
+        ]));
+    }
+
+    protected function linkedInProfileCopyText(array $payload): string
+    {
+        return implode("\n\n", array_filter([
+            'LINKEDIN HEADLINE & ABOUT',
+            'Headline:',
+            collect($payload['headlines'] ?? [])->map(fn (string $item, int $index): string => ($index + 1).'. '.$item)->implode("\n"),
+            'About singkat:',
+            $payload['about_short'] ?? '',
+            'About profesional:',
+            $payload['about_professional'] ?? '',
+        ]));
+    }
+
+    protected function jdMatcherCopyText(array $payload): string
+    {
+        return implode("\n\n", array_filter([
+            'JOB DESCRIPTION MATCHER',
+            'Posisi target: '.($payload['target_position'] ?? ''),
+            'Match score: '.($payload['score'] ?? 0).'%',
+            'Status: '.($payload['status_label'] ?? ''),
+            'Keyword cocok: '.implode(', ', $payload['matched_keywords'] ?? []),
+            'Keyword belum muncul: '.implode(', ', $payload['missing_keywords'] ?? []),
+            'Saran: '.implode(' ', $payload['optimization_suggestions'] ?? []),
+        ]));
+    }
+
+    protected function atsCvCheckerCopyText(array $payload): string
+    {
+        return implode("\n\n", array_filter([
+            'ATS CV CHECKER',
+            'Posisi target: '.($payload['target_position'] ?? ''),
+            'Skor CV: '.($payload['score'] ?? 0).'/100',
+            'Label: '.($payload['label'] ?? ''),
+            'Yang sudah baik: '.implode(' ', $payload['good_points'] ?? []),
+            'Yang perlu diperbaiki: '.implode(' ', $payload['improvements'] ?? []),
+        ]));
+    }
+
+    protected function dailyWorkReportCopyText(array $payload): string
+    {
+        return match ($payload['output_format'] ?? '') {
+            'email' => "Subject: ".($payload['email_subject'] ?? '')."\n\n".($payload['email_body'] ?? ''),
+            'whatsapp-chat' => (string) ($payload['whatsapp_text'] ?? ''),
+            default => (string) ($payload['document_text'] ?? ''),
+        };
+    }
+
     protected function buildFilename(string $generatorType, array $document): string
     {
         return match ($generatorType) {
@@ -614,6 +757,12 @@ class DocumentGeneratorService
             'quotation' => 'quotation-'.Str::slug((string) ($document['quotation_number'] ?? 'bantukerja')).'.pdf',
             'sop' => 'sop-'.Str::slug((string) ($document['sop_name'] ?? 'bantukerja')).'.pdf',
             'job-description' => 'job-description-'.Str::slug((string) ($document['position_name'] ?? 'bantukerja')).'.pdf',
+            'interview-simulation' => 'simulasi-interview-'.Str::slug((string) ($document['position_applied'] ?? 'bantukerja')).'.pdf',
+            'interview-star' => 'jawaban-star-'.Str::slug((string) ($document['position_applied'] ?? 'bantukerja')).'.pdf',
+            'linkedin-profile' => 'linkedin-headline-about-'.Str::slug((string) ($document['target_position'] ?? 'bantukerja')).'.pdf',
+            'jd-matcher' => 'job-description-matcher-'.Str::slug((string) ($document['target_position'] ?? 'bantukerja')).'.pdf',
+            'ats-cv-checker' => 'ats-cv-checker-'.Str::slug((string) ($document['target_position'] ?? 'bantukerja')).'.pdf',
+            'daily-work-report' => 'laporan-kerja-harian-'.Str::slug((string) ($document['author_name'] ?? 'bantukerja')).'.pdf',
             default => 'dokumen-bantukerja.pdf',
         };
     }
@@ -629,6 +778,12 @@ class DocumentGeneratorService
             'quotation' => 'Print Quotation '.$document['quotation_number'],
             'sop' => 'Print '.$document['sop_name'],
             'job-description' => 'Print Job Description '.$document['position_name'],
+            'interview-simulation' => 'Print Simulasi Pertanyaan Interview',
+            'interview-star' => 'Print Jawaban Interview STAR',
+            'linkedin-profile' => 'Print LinkedIn Headline & About',
+            'jd-matcher' => 'Print Job Description Matcher',
+            'ats-cv-checker' => 'Print ATS CV Checker',
+            'daily-work-report' => 'Print Laporan Kerja Harian',
             default => 'Print Dokumen',
         };
     }

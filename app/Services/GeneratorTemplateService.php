@@ -106,6 +106,12 @@ class GeneratorTemplateService
             'quotation' => 'generators.quotation.templates.professional',
             'sop' => 'generators.sop.templates.standard',
             'job-description' => 'generators.job-description.templates.hr',
+            'interview-simulation' => 'generators.interview-simulation.templates.standard',
+            'interview-star' => 'generators.interview-star.templates.standard',
+            'linkedin-profile' => 'generators.linkedin-profile.templates.standard',
+            'jd-matcher' => 'generators.jd-matcher.templates.standard',
+            'ats-cv-checker' => 'generators.ats-cv-checker.templates.standard',
+            'daily-work-report' => 'generators.daily-work-report.templates.standard',
             default => 'generators.letter.templates.simple',
         };
     }
@@ -147,6 +153,24 @@ class GeneratorTemplateService
             'job-description' => [
                 ['name' => 'HR Formal', 'slug' => 'job-description-hr', 'description' => 'Format internal HR yang rapi dan lengkap.', 'view_path' => 'generators.job-description.templates.hr'],
                 ['name' => 'Job Posting', 'slug' => 'job-description-posting', 'description' => 'Versi lebih komunikatif untuk publikasi lowongan kerja.', 'view_path' => 'generators.job-description.templates.posting'],
+            ],
+            'interview-simulation' => [
+                ['name' => 'Standard', 'slug' => 'interview-simulation-standard', 'description' => 'Daftar pertanyaan interview dengan checklist persiapan.', 'view_path' => 'generators.interview-simulation.templates.standard'],
+            ],
+            'interview-star' => [
+                ['name' => 'Standard', 'slug' => 'interview-star-standard', 'description' => 'Template jawaban STAR yang rapi dan siap dipelajari.', 'view_path' => 'generators.interview-star.templates.standard'],
+            ],
+            'linkedin-profile' => [
+                ['name' => 'Standard', 'slug' => 'linkedin-profile-standard', 'description' => 'Headline dan About LinkedIn dalam format ringkas profesional.', 'view_path' => 'generators.linkedin-profile.templates.standard'],
+            ],
+            'jd-matcher' => [
+                ['name' => 'Standard', 'slug' => 'jd-matcher-standard', 'description' => 'Analisis kecocokan CV singkat dengan lowongan kerja.', 'view_path' => 'generators.jd-matcher.templates.standard'],
+            ],
+            'ats-cv-checker' => [
+                ['name' => 'Standard', 'slug' => 'ats-cv-checker-standard', 'description' => 'Ringkasan skor ATS CV checker sederhana.', 'view_path' => 'generators.ats-cv-checker.templates.standard'],
+            ],
+            'daily-work-report' => [
+                ['name' => 'Standard', 'slug' => 'daily-work-report-standard', 'description' => 'Laporan kerja harian praktis untuk copy, print, atau PDF.', 'view_path' => 'generators.daily-work-report.templates.standard'],
             ],
             default => [],
         };

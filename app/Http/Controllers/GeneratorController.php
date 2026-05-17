@@ -3,9 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ApplicationLetterGeneratorRequest;
+use App\Http\Requests\AtsCvCheckerRequest;
+use App\Http\Requests\DailyWorkReportRequest;
 use App\Http\Requests\InvoiceGeneratorRequest;
+use App\Http\Requests\InterviewSimulationRequest;
+use App\Http\Requests\InterviewStarAnswerRequest;
 use App\Http\Requests\JobDescriptionGeneratorRequest;
+use App\Http\Requests\JobDescriptionMatcherRequest;
 use App\Http\Requests\LetterGeneratorRequest;
+use App\Http\Requests\LinkedInProfileGeneratorRequest;
 use App\Http\Requests\MinutesGeneratorRequest;
 use App\Http\Requests\QuotationGeneratorRequest;
 use App\Http\Requests\ReceiptGeneratorRequest;
@@ -433,6 +439,195 @@ class GeneratorController extends Controller
             $request->validated(),
             $request->input('template_slug'),
             'job-description-bantukerja.txt',
+        );
+    }
+
+    public function previewInterviewSimulation(
+        InterviewSimulationRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'simulasi-pertanyaan-interview', 'interview-simulation', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadInterviewSimulation(
+        InterviewSimulationRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'interview-simulation', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printInterviewSimulation(
+        InterviewSimulationRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'interview-simulation', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadInterviewSimulationText(
+        InterviewSimulationRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'interview-simulation', $request->validated(), $request->input('template_slug'), 'simulasi-pertanyaan-interview-bantukerja.txt');
+    }
+
+    public function previewInterviewStarAnswer(
+        InterviewStarAnswerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'interview-answer-star', 'interview-star', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadInterviewStarAnswer(
+        InterviewStarAnswerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'interview-star', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printInterviewStarAnswer(
+        InterviewStarAnswerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'interview-star', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadInterviewStarAnswerText(
+        InterviewStarAnswerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'interview-star', $request->validated(), $request->input('template_slug'), 'jawaban-interview-star-bantukerja.txt');
+    }
+
+    public function previewLinkedInProfile(
+        LinkedInProfileGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'linkedin-headline-about-generator', 'linkedin-profile', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadLinkedInProfile(
+        LinkedInProfileGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'linkedin-profile', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printLinkedInProfile(
+        LinkedInProfileGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'linkedin-profile', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadLinkedInProfileText(
+        LinkedInProfileGeneratorRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'linkedin-profile', $request->validated(), $request->input('template_slug'), 'linkedin-headline-about-bantukerja.txt');
+    }
+
+    public function previewJobDescriptionMatcher(
+        JobDescriptionMatcherRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'job-description-matcher', 'jd-matcher', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadJobDescriptionMatcher(
+        JobDescriptionMatcherRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'jd-matcher', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printJobDescriptionMatcher(
+        JobDescriptionMatcherRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'jd-matcher', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadJobDescriptionMatcherText(
+        JobDescriptionMatcherRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'jd-matcher', $request->validated(), $request->input('template_slug'), 'job-description-matcher-bantukerja.txt');
+    }
+
+    public function previewAtsCvChecker(
+        AtsCvCheckerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'ats-cv-checker', 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadAtsCvChecker(
+        AtsCvCheckerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printAtsCvChecker(
+        AtsCvCheckerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadAtsCvCheckerText(
+        AtsCvCheckerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'), 'ats-cv-checker-bantukerja.txt');
+    }
+
+    public function previewDailyWorkReport(
+        DailyWorkReportRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ): RedirectResponse {
+        return $this->previewResponse($request, $documentGeneratorService, 'generator-laporan-kerja-harian', 'daily-work-report', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadDailyWorkReport(
+        DailyWorkReportRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'daily-work-report', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function printDailyWorkReport(
+        DailyWorkReportRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+    ) {
+        return $this->printResponse($request, $documentGeneratorService, 'daily-work-report', $request->validated(), $request->input('template_slug'));
+    }
+
+    public function downloadDailyWorkReportText(
+        DailyWorkReportRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'daily-work-report', $request->validated(), $request->input('template_slug'), 'laporan-kerja-harian-bantukerja.txt');
+    }
+
+    public function downloadDailyWorkReportWord(
+        DailyWorkReportRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $documentState = $documentGeneratorService->compose('daily-work-report', $request->validated(), $request->input('template_slug'));
+        $documentGeneratorService->logAction($request, 'daily-work-report', $documentState['template_slug'], 'download_pdf');
+
+        return $templateRenderService->downloadWord(
+            'laporan-kerja-harian-bantukerja.doc',
+            'Laporan Kerja Harian',
+            view('word.daily-work-report', ['document' => $documentState['payload']])->render(),
         );
     }
 

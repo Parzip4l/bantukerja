@@ -38,6 +38,13 @@
                     <p class="eyebrow">{{ $tool->category?->name }}</p>
                     <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{{ $tool->title }}</h1>
                     <p class="mt-4 text-base leading-8 text-slate-600">{{ $tool->short_description }}</p>
+                    @if ($tool->tool_type === 'generator')
+                        <div class="mt-5 flex flex-wrap gap-2.5">
+                            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Gratis</span>
+                            <span class="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">Tanpa AI API</span>
+                            <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">Bisa langsung digunakan</span>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="mt-6">
@@ -185,6 +192,30 @@
 
                         @case('generator-job-description')
                             @include('tools.generators.job-description')
+                        @break
+
+                        @case('simulasi-pertanyaan-interview')
+                            @include('tools.generators.interview-simulation')
+                        @break
+
+                        @case('interview-answer-star')
+                            @include('tools.generators.interview-star')
+                        @break
+
+                        @case('linkedin-headline-about-generator')
+                            @include('tools.generators.linkedin-profile')
+                        @break
+
+                        @case('job-description-matcher')
+                            @include('tools.generators.jd-matcher')
+                        @break
+
+                        @case('ats-cv-checker')
+                            @include('tools.generators.ats-cv-checker')
+                        @break
+
+                        @case('generator-laporan-kerja-harian')
+                            @include('tools.generators.daily-work-report')
                         @break
 
                         @case('generator-kwitansi')

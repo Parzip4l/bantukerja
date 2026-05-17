@@ -345,9 +345,125 @@ const initializeHomeSearch = () => {
     });
 };
 
+const initializeCareerToolPresets = () => {
+    const source = document.querySelector('#career-tool-presets');
+
+    if (!source) {
+        return;
+    }
+
+    const presets = JSON.parse(source.textContent || '{}');
+
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-career-preset-fill]');
+
+        if (!button) {
+            return;
+        }
+
+        const key = button.getAttribute('data-career-preset-fill');
+        const select = document.querySelector(`[data-career-preset-select="${key}"]`);
+        const preset = presets[select?.value || ''];
+
+        if (!preset) {
+            return;
+        }
+
+        const resolveValue = (object, key) => key.split('.').reduce((carry, part) => carry?.[part], object);
+
+        document.querySelectorAll(`[data-career-preset-group="${key}"] [data-career-preset-field]`).forEach((field) => {
+            const sourceKey = field.getAttribute('data-career-preset-field');
+            const value = resolveValue(preset, sourceKey);
+
+            if (value === undefined || value === null) {
+                return;
+            }
+
+            field.value = Array.isArray(value) ? value.join(', ') : value;
+        });
+    });
+};
+
+const initializeAnalyticsEvents = () => {
+    const normalizeScoreRange = (value) => {
+        const numeric = Number.parseInt(value, 10);
+
+        if (Number.isNaN(numeric)) {
+            return value || undefined;
+        }
+
+        if (numeric >= 80) {
+            return '80-100';
+        }
+
+        if (numeric >= 60) {
+            return '60-79';
+        }
+
+        if (numeric >= 40) {
+            return '40-59';
+        }
+
+        return '0-39';
+    };
+
+    const emit = (eventName, params = {}) => {
+        const payload = {
+            page_location: window.location.pathname,
+            ...params,
+        };
+
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', eventName, payload);
+            return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: eventName, ...payload });
+    };
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target.closest('[data-analytics-generate-form]');
+
+        if (!form) {
+            return;
+        }
+
+        emit(form.getAttribute('data-analytics-event') || 'career_tool_generate', {
+            tool_name: form.getAttribute('data-tool-name') || 'unknown',
+            action: 'generate',
+            score_range: normalizeScoreRange(form.getAttribute('data-score-range')),
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        const copyTarget = event.target.closest('[data-analytics-copy]');
+
+        if (copyTarget) {
+            emit(copyTarget.getAttribute('data-analytics-event') || 'career_tool_copy', {
+                tool_name: copyTarget.getAttribute('data-tool-name') || 'unknown',
+                action: 'copy',
+                score_range: normalizeScoreRange(copyTarget.getAttribute('data-score-range')),
+            });
+        }
+
+        const exportTarget = event.target.closest('[data-analytics-export]');
+
+        if (exportTarget) {
+            emit(exportTarget.getAttribute('data-analytics-event') || 'career_tool_export', {
+                tool_name: exportTarget.getAttribute('data-tool-name') || 'unknown',
+                action: exportTarget.getAttribute('data-export-type') || 'export',
+                score_range: normalizeScoreRange(exportTarget.getAttribute('data-score-range')),
+            });
+        }
+    });
+};
+
 copyToClipboard();
 initializeRepeaters();
 initializeMobileMenu();
 initializeRupiahInputs();
 initializeGeneratorPresets();
 initializeHomeSearch();
+initializeCareerToolPresets();
+initializeAnalyticsEvents();
