@@ -51,7 +51,7 @@
             <button type="button" onclick="window.close()">Tutup</button>
         </div>
 
-        @include($templateView, ['document' => $document, 'template' => $template])
+        @include($templateView, ['document' => $document, 'template' => $template, 'renderMode' => $renderMode ?? 'print'])
     </div>
 </body>
 </html>

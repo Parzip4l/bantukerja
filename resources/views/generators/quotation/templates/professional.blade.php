@@ -1,8 +1,14 @@
+@php
+    $vendorLogoSource = ($renderMode ?? 'preview') === 'pdf'
+        ? ($document['vendor_logo_pdf_path'] ?? null)
+        : ($document['vendor_logo_url'] ?? null);
+@endphp
+
 <div style="margin:0 auto;max-width:840px;border:1px solid #cbd5e1;border-radius:20px;padding:30px;background:#fff;color:#0f172a;font-family:DejaVu Sans,sans-serif;">
     <div style="display:table;width:100%;margin-bottom:24px;">
         <div style="display:table-cell;width:56%;vertical-align:top;padding-right:16px;">
-            @if (! empty($document['vendor_logo_url']))
-                <img src="{{ $document['vendor_logo_url'] }}" alt="{{ $document['vendor_name'] }}" style="max-height:48px;max-width:180px;margin-bottom:14px;">
+            @if (! empty($vendorLogoSource))
+                <img src="{{ $vendorLogoSource }}" alt="{{ $document['vendor_name'] }}" style="max-height:48px;max-width:180px;margin-bottom:14px;">
             @endif
             <div style="font-size:22px;font-weight:700;">{{ $document['vendor_name'] }}</div>
             <div style="margin-top:8px;font-size:12px;line-height:1.8;color:#475569;">{{ $document['vendor_address'] }}</div>

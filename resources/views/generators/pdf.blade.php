@@ -12,6 +12,6 @@
     </style>
 </head>
 <body>
-    @include($templateView, ['document' => $document, 'template' => $template])
+    @include($templateView, ['document' => $document, 'template' => $template, 'renderMode' => $renderMode ?? 'pdf'])
 </body>
 </html>

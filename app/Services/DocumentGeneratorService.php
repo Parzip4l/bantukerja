@@ -61,6 +61,7 @@ class DocumentGeneratorService
             'template' => $documentState['template'],
             'templateView' => $this->templateService->resolveViewPath($documentState['template']),
             'document' => $documentState['payload'],
+            'renderMode' => 'pdf',
         ])
             ->setPaper($documentState['template']->paper_size ?: 'a4', $documentState['template']->orientation ?: 'portrait')
             ->download($documentState['file_name']);
@@ -75,6 +76,7 @@ class DocumentGeneratorService
             'templateView' => $this->templateService->resolveViewPath($documentState['template']),
             'document' => $documentState['payload'],
             'title' => $this->documentTitle($generatorType, $documentState['payload']),
+            'renderMode' => 'print',
         ]);
     }
 
@@ -172,6 +174,7 @@ class DocumentGeneratorService
             'template' => $template,
             'templateView' => $this->templateService->resolveViewPath($template),
             'document' => $document,
+            'renderMode' => 'preview',
         ])->render();
     }
 
@@ -220,6 +223,7 @@ class DocumentGeneratorService
         return array_merge($payload, $summary, [
             'business_logo_path' => $businessLogoPath,
             'business_logo_url' => $this->templateRenderService->publicUrl($businessLogoPath),
+            'business_logo_pdf_path' => $this->templateRenderService->publicStoragePath($businessLogoPath),
             'invoice_date_label' => DocumentFormatter::dateLabel($payload['invoice_date'] ?? null),
             'due_date_label' => DocumentFormatter::dateLabel($payload['due_date'] ?? null),
             'business_contact_line' => collect([
@@ -396,6 +400,7 @@ class DocumentGeneratorService
             'template_variant' => $templateSlug ?: 'quotation-professional',
             'vendor_logo_path' => $logoPath,
             'vendor_logo_url' => $this->templateRenderService->publicUrl($logoPath),
+            'vendor_logo_pdf_path' => $this->templateRenderService->publicStoragePath($logoPath),
             'quotation_date_label' => DocumentFormatter::dateLabel($quotationDate),
             'valid_until_label' => $quotationDate ? Carbon::parse($quotationDate)->addDays($validityDays)->translatedFormat('d F Y') : null,
             'validity_label' => $validityDays.' hari kalender',
