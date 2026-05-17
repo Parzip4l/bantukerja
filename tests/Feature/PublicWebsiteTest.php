@@ -60,6 +60,17 @@ class PublicWebsiteTest extends TestCase
         }
     }
 
+    public function test_homepage_shows_key_landing_sections(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Buat Dokumen Kerja dan Administrasi Lebih Cepat')
+            ->assertSee('Kenapa menggunakan Bantu Kerja?')
+            ->assertSee('Pilih tools sesuai kebutuhan Anda')
+            ->assertSee('Cara menggunakan Bantu Kerja')
+            ->assertSee('Butuh sistem digital untuk bisnis atau perusahaan?');
+    }
+
     public function test_thr_calculator_returns_result_in_session(): void
     {
         $response = $this->from('/tools/kalkulator-thr')->post('/tools/kalkulator-thr/calculate', [

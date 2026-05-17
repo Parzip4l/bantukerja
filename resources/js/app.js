@@ -279,8 +279,75 @@ const initializeGeneratorPresets = () => {
     }
 };
 
+const initializeHomeSearch = () => {
+    const form = document.querySelector('[data-home-search]');
+    const input = document.querySelector('[data-home-search-input]');
+    const results = document.querySelector('[data-home-search-results]');
+    const source = document.querySelector('#home-search-index');
+
+    if (!form || !input || !results || !source) {
+        return;
+    }
+
+    const items = JSON.parse(source.textContent || '[]');
+
+    const renderResults = (keyword) => {
+        const normalizedKeyword = keyword.trim().toLowerCase();
+
+        if (normalizedKeyword.length < 2) {
+            results.innerHTML = '';
+            results.classList.add('hidden');
+            return;
+        }
+
+        const matches = items
+            .filter((item) => {
+                const haystack = `${item.title} ${item.description} ${item.type}`.toLowerCase();
+
+                return haystack.includes(normalizedKeyword);
+            })
+            .slice(0, 6);
+
+        if (!matches.length) {
+            results.innerHTML = '<p class="px-2 py-1 text-sm text-slate-500">Belum ada hasil yang cocok. Coba kata kunci lain atau tekan cari untuk membuka halaman tools.</p>';
+            results.classList.remove('hidden');
+            return;
+        }
+
+        results.innerHTML = matches.map((item) => `
+            <a href="${item.url}" class="block rounded-2xl px-3 py-3 transition hover:bg-white">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">${item.title}</p>
+                        <p class="mt-1 text-sm leading-6 text-slate-500">${item.description || ''}</p>
+                    </div>
+                    <span class="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600">${item.type}</span>
+                </div>
+            </a>
+        `).join('');
+        results.classList.remove('hidden');
+    };
+
+    input.addEventListener('input', () => {
+        renderResults(input.value);
+    });
+
+    input.addEventListener('focus', () => {
+        renderResults(input.value);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (form.contains(event.target)) {
+            return;
+        }
+
+        results.classList.add('hidden');
+    });
+};
+
 copyToClipboard();
 initializeRepeaters();
 initializeMobileMenu();
 initializeRupiahInputs();
 initializeGeneratorPresets();
+initializeHomeSearch();
