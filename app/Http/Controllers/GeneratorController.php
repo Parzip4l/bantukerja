@@ -562,21 +562,21 @@ class GeneratorController extends Controller
         AtsCvCheckerRequest $request,
         DocumentGeneratorService $documentGeneratorService,
     ): RedirectResponse {
-        return $this->previewResponse($request, $documentGeneratorService, 'ats-cv-checker', 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+        return $this->previewResponse($request, $documentGeneratorService, 'ats-cv-checker', 'ats-cv-checker', $this->atsCvCheckerPayload($request), $request->input('template_slug'));
     }
 
     public function downloadAtsCvChecker(
         AtsCvCheckerRequest $request,
         DocumentGeneratorService $documentGeneratorService,
     ) {
-        return $this->downloadPdfResponse($request, $documentGeneratorService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+        return $this->downloadPdfResponse($request, $documentGeneratorService, 'ats-cv-checker', $this->atsCvCheckerPayload($request), $request->input('template_slug'));
     }
 
     public function printAtsCvChecker(
         AtsCvCheckerRequest $request,
         DocumentGeneratorService $documentGeneratorService,
     ) {
-        return $this->printResponse($request, $documentGeneratorService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'));
+        return $this->printResponse($request, $documentGeneratorService, 'ats-cv-checker', $this->atsCvCheckerPayload($request), $request->input('template_slug'));
     }
 
     public function downloadAtsCvCheckerText(
@@ -584,7 +584,22 @@ class GeneratorController extends Controller
         DocumentGeneratorService $documentGeneratorService,
         TemplateRenderService $templateRenderService,
     ) {
-        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'ats-cv-checker', $request->validated(), $request->input('template_slug'), 'ats-cv-checker-bantukerja.txt');
+        return $this->downloadTextResponse($request, $documentGeneratorService, $templateRenderService, 'ats-cv-checker', $this->atsCvCheckerPayload($request), $request->input('template_slug'), 'ats-cv-checker-bantukerja.txt');
+    }
+
+    public function downloadAtsCvCheckerWord(
+        AtsCvCheckerRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $documentState = $documentGeneratorService->compose('ats-cv-checker', $this->atsCvCheckerPayload($request), $request->input('template_slug'));
+        $documentGeneratorService->logAction($request, 'ats-cv-checker', $documentState['template_slug'], 'download_word');
+
+        return $templateRenderService->downloadWord(
+            'ats-cv-checker-bantukerja.doc',
+            'ATS CV Checker',
+            view('word.ats-cv-checker', ['document' => $documentState['payload']])->render(),
+        );
     }
 
     public function previewDailyWorkReport(
@@ -631,6 +646,21 @@ class GeneratorController extends Controller
         );
     }
 
+    public function downloadJobDescriptionMatcherWord(
+        JobDescriptionMatcherRequest $request,
+        DocumentGeneratorService $documentGeneratorService,
+        TemplateRenderService $templateRenderService,
+    ) {
+        $documentState = $documentGeneratorService->compose('jd-matcher', $request->validated(), $request->input('template_slug'));
+        $documentGeneratorService->logAction($request, 'jd-matcher', $documentState['template_slug'], 'download_word');
+
+        return $templateRenderService->downloadWord(
+            'job-description-matcher-bantukerja.doc',
+            'Job Description Matcher',
+            view('word.jd-matcher', ['document' => $documentState['payload']])->render(),
+        );
+    }
+
     protected function invoicePayload(
         InvoiceGeneratorRequest $request,
         TemplateRenderService $templateRenderService,
@@ -657,6 +687,13 @@ class GeneratorController extends Controller
         }
 
         return $payload;
+    }
+
+    protected function atsCvCheckerPayload(AtsCvCheckerRequest $request): array
+    {
+        return collect($request->validated())
+            ->except('cv_pdf')
+            ->all();
     }
 
     protected function previewResponse(

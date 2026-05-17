@@ -7,7 +7,7 @@
 <div class="grid gap-6 xl:grid-cols-[minmax(0,0.96fr),minmax(320px,1fr)]">
     <div class="order-2 rounded-3xl border border-slate-200 p-5 xl:order-1">
         <h2 class="text-lg font-semibold text-slate-900">Cek Skor CV ATS Friendly</h2>
-        <p class="mt-2 text-sm leading-7 text-slate-600">Paste isi CV Anda untuk mengecek struktur dasar, keyword, skill, dan elemen ATS-friendly secara sederhana. Tool ini bukan ATS resmi perusahaan.</p>
+        <p class="mt-2 text-sm leading-7 text-slate-600">Upload PDF CV berbasis teks atau paste isi CV Anda untuk mengecek struktur dasar, keyword, skill, dan elemen ATS-friendly secara sederhana. Tool ini bukan ATS resmi perusahaan.</p>
 
         <div class="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-4" data-career-preset-group="ats-cv-checker">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -21,18 +21,24 @@
             </div>
         </div>
 
-        <form id="ats-cv-checker-form" method="post" action="{{ route('tools.ats-cv-checker.preview') }}" class="mt-5 grid gap-5 sm:grid-cols-2" data-analytics-generate-form data-analytics-event="cv_score_check" data-tool-name="ats_cv_checker">
+        <form id="ats-cv-checker-form" method="post" action="{{ route('tools.ats-cv-checker.preview') }}" enctype="multipart/form-data" class="mt-5 grid gap-5 sm:grid-cols-2" data-analytics-generate-form data-analytics-event="cv_score_check" data-tool-name="ats_cv_checker">
             @csrf
             <input type="hidden" name="template_slug" value="{{ $selectedTemplateSlug }}">
             <div><label class="mb-2 block text-sm font-medium text-slate-700">Posisi target</label><input type="text" name="target_position" value="{{ old('target_position') }}" data-career-preset-field="label" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="Frontend Developer"></div>
             <div><label class="mb-2 block text-sm font-medium text-slate-700">Level pengalaman</label><select name="experience_level" class="h-12 w-full rounded-2xl border border-slate-200 px-4">@foreach (['fresh-graduate' => 'Fresh Graduate', '0-1-tahun' => '0-1 tahun', '1-3-tahun' => '1-3 tahun', '3-5-tahun' => '3-5 tahun', '5-plus-tahun' => 'Lebih dari 5 tahun'] as $value => $label)<option value="{{ $value }}" @selected(old('experience_level') === $value)>{{ $label }}</option>@endforeach</select></div>
-            <div class="sm:col-span-2"><label class="mb-2 block text-sm font-medium text-slate-700">Isi CV</label><textarea name="cv_text" rows="12" class="w-full rounded-2xl border border-slate-200 px-4 py-3" placeholder="Paste isi CV Anda di sini...">{{ old('cv_text') }}</textarea><p class="mt-2 text-xs leading-6 text-slate-500">Gunakan paste teks CV. Tool ini tidak menyimpan isi CV ke database.</p></div>
+            <div class="sm:col-span-2">
+                <label class="mb-2 block text-sm font-medium text-slate-700">Upload PDF CV</label>
+                <input type="file" name="cv_pdf" accept="application/pdf,.pdf" class="block w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700">
+                <p class="mt-2 text-xs leading-6 text-slate-500">Gunakan PDF berbasis teks, bukan hasil scan gambar. File hanya dipakai untuk membaca isi CV di request ini dan tidak disimpan permanen.</p>
+            </div>
+            <div class="sm:col-span-2"><label class="mb-2 block text-sm font-medium text-slate-700">Isi CV</label><textarea name="cv_text" rows="12" class="w-full rounded-2xl border border-slate-200 px-4 py-3" placeholder="Upload PDF CV atau paste isi CV Anda di sini...">{{ old('cv_text') }}</textarea><p class="mt-2 text-xs leading-6 text-slate-500">Jika PDF tidak terbaca penuh, Anda tetap bisa paste isi CV secara manual. Tool ini tidak menyimpan isi CV ke database.</p></div>
             <div class="sm:col-span-2"><label class="mb-2 block text-sm font-medium text-slate-700">Skill utama</label><input type="text" name="main_skills" value="{{ old('main_skills') }}" data-career-preset-field="skills" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="React, JavaScript, CSS, Git"></div>
             <div class="sm:col-span-2"><label class="mb-2 block text-sm font-medium text-slate-700">Industri target</label><input type="text" name="target_industry" value="{{ old('target_industry') }}" data-career-preset-field="industry" class="h-12 w-full rounded-2xl border border-slate-200 px-4" placeholder="Teknologi, startup, manufaktur"></div>
 
             <div class="sm:col-span-2 flex flex-wrap gap-3">
                 <button class="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white">Cek skor CV</button>
                 <button formaction="{{ route('tools.ats-cv-checker.pdf') }}" data-analytics-export data-analytics-event="career_tool_export" data-tool-name="ats_cv_checker" data-export-type="pdf" data-score-range="{{ $scoreRange }}" class="h-12 rounded-2xl bg-blue-700 px-5 text-sm font-semibold text-white">Download PDF</button>
+                <button formaction="{{ route('tools.ats-cv-checker.word') }}" data-analytics-export data-analytics-event="career_tool_export" data-tool-name="ats_cv_checker" data-export-type="word" data-score-range="{{ $scoreRange }}" class="h-12 rounded-2xl border border-blue-200 bg-white px-5 text-sm font-semibold text-blue-700">Download Word</button>
                 <button formaction="{{ route('tools.ats-cv-checker.print') }}" formtarget="_blank" data-analytics-export data-analytics-event="career_tool_export" data-tool-name="ats_cv_checker" data-export-type="print" data-score-range="{{ $scoreRange }}" class="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Print</button>
                 <button formaction="{{ route('tools.ats-cv-checker.download') }}" data-analytics-export data-analytics-event="career_tool_export" data-tool-name="ats_cv_checker" data-export-type="txt" data-score-range="{{ $scoreRange }}" class="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Download TXT</button>
                 <button type="reset" class="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700">Reset form</button>

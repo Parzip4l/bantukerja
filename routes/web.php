@@ -11,6 +11,7 @@ use App\Http\Controllers\ToolController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/karier-interview', [HomeController::class, 'careerInterview'])->name('career.interview');
 
 Route::get('/tools', [ToolController::class, 'index'])->name('tools.index');
 Route::get('/tools/{slug}', [ToolController::class, 'show'])->name('tools.show');
@@ -61,10 +62,12 @@ Route::post('/tools/linkedin-headline-about-generator/pdf', [GeneratorController
 Route::post('/tools/linkedin-headline-about-generator/print', [GeneratorController::class, 'printLinkedInProfile'])->middleware('throttle:10,1')->name('tools.linkedin-profile.print');
 Route::post('/tools/job-description-matcher/preview', [GeneratorController::class, 'previewJobDescriptionMatcher'])->middleware('throttle:20,1')->name('tools.jd-matcher.preview');
 Route::post('/tools/job-description-matcher/download', [GeneratorController::class, 'downloadJobDescriptionMatcherText'])->middleware('throttle:10,1')->name('tools.jd-matcher.download');
+Route::post('/tools/job-description-matcher/word', [GeneratorController::class, 'downloadJobDescriptionMatcherWord'])->middleware('throttle:10,1')->name('tools.jd-matcher.word');
 Route::post('/tools/job-description-matcher/pdf', [GeneratorController::class, 'downloadJobDescriptionMatcher'])->middleware('throttle:10,1')->name('tools.jd-matcher.pdf');
 Route::post('/tools/job-description-matcher/print', [GeneratorController::class, 'printJobDescriptionMatcher'])->middleware('throttle:10,1')->name('tools.jd-matcher.print');
 Route::post('/tools/ats-cv-checker/preview', [GeneratorController::class, 'previewAtsCvChecker'])->middleware('throttle:20,1')->name('tools.ats-cv-checker.preview');
 Route::post('/tools/ats-cv-checker/download', [GeneratorController::class, 'downloadAtsCvCheckerText'])->middleware('throttle:10,1')->name('tools.ats-cv-checker.download');
+Route::post('/tools/ats-cv-checker/word', [GeneratorController::class, 'downloadAtsCvCheckerWord'])->middleware('throttle:10,1')->name('tools.ats-cv-checker.word');
 Route::post('/tools/ats-cv-checker/pdf', [GeneratorController::class, 'downloadAtsCvChecker'])->middleware('throttle:10,1')->name('tools.ats-cv-checker.pdf');
 Route::post('/tools/ats-cv-checker/print', [GeneratorController::class, 'printAtsCvChecker'])->middleware('throttle:10,1')->name('tools.ats-cv-checker.print');
 Route::post('/tools/generator-laporan-kerja-harian/preview', [GeneratorController::class, 'previewDailyWorkReport'])->middleware('throttle:20,1')->name('tools.daily-work-report.preview');

@@ -70,14 +70,7 @@ class HomeController extends Controller
 
         $searchIndex = $this->buildSearchIndex($allTools, $allTemplates, $allPosts);
         $personaSections = $this->buildPersonaSections($toolLookup, $templateLookup);
-        $careerSpotlight = collect([
-            $toolLookup->get('generator-cv-ats'),
-            $toolLookup->get('generator-surat-lamaran-kerja'),
-            $toolLookup->get('simulasi-pertanyaan-interview'),
-            $toolLookup->get('interview-answer-star'),
-            $toolLookup->get('linkedin-headline-about-generator'),
-            $toolLookup->get('ats-cv-checker'),
-        ])->filter()->values();
+        $careerSpotlight = $this->careerTools($toolLookup)->take(6)->values();
 
         return view('home.index', [
             'seo' => $seoService->defaults([
@@ -98,6 +91,60 @@ class HomeController extends Controller
                 ['label' => 'Artikel Panduan', 'value' => number_format($allPosts->count())],
             ],
             'heroHighlights' => $popularTools->take(3),
+        ]);
+    }
+
+    public function careerInterview(SeoService $seoService): View
+    {
+        $allTools = Tool::query()
+            ->with('category')
+            ->published()
+            ->get();
+
+        $allTemplates = DocumentTemplate::query()
+            ->with('category')
+            ->published()
+            ->get();
+
+        $allPosts = Post::query()
+            ->with('category')
+            ->published()
+            ->get();
+
+        $toolLookup = $allTools->keyBy('slug');
+        $templateLookup = $allTemplates->keyBy('slug');
+
+        $careerTools = $this->careerTools($toolLookup);
+        $careerTemplates = collect([
+            $templateLookup->get('cv-lamaran-kerja'),
+            $templateLookup->get('surat-lamaran-kerja'),
+        ])->filter()->values();
+
+        $careerArticles = $allPosts
+            ->filter(function (Post $post): bool {
+                $haystack = str($post->title.' '.$post->excerpt)->lower()->toString();
+
+                return str_contains($haystack, 'cv')
+                    || str_contains($haystack, 'lamaran')
+                    || str_contains($haystack, 'interview')
+                    || str_contains($haystack, 'karier')
+                    || str_contains($haystack, 'linkedin');
+            })
+            ->take(6)
+            ->values();
+
+        if ($careerArticles->isEmpty()) {
+            $careerArticles = $allPosts->take(3)->values();
+        }
+
+        return view('home.career-interview', [
+            'seo' => $seoService->defaults([
+                'title' => 'Karier & Interview - Tools Gratis Bantu Kerja',
+                'description' => 'Siapkan CV ATS, surat lamaran, latihan interview, LinkedIn, ATS checker, dan job matching dalam satu cluster karier yang lebih rapi.',
+            ]),
+            'careerTools' => $careerTools,
+            'careerTemplates' => $careerTemplates,
+            'careerArticles' => $careerArticles,
         ]);
     }
 
@@ -207,5 +254,19 @@ class HomeController extends Controller
 
             return $section;
         })->filter(fn (array $section) => collect($section['items'])->isNotEmpty())->values();
+    }
+
+    protected function careerTools(Collection $toolLookup): Collection
+    {
+        return collect([
+            $toolLookup->get('generator-cv-ats'),
+            $toolLookup->get('generator-surat-lamaran-kerja'),
+            $toolLookup->get('simulasi-pertanyaan-interview'),
+            $toolLookup->get('interview-answer-star'),
+            $toolLookup->get('linkedin-headline-about-generator'),
+            $toolLookup->get('job-description-matcher'),
+            $toolLookup->get('ats-cv-checker'),
+            $toolLookup->get('generator-job-description'),
+        ])->filter()->values();
     }
 }

@@ -22,6 +22,17 @@
         'end_year' => '',
         'description' => '',
     ]]);
+    $careerClusterSlugs = [
+        'generator-cv-ats',
+        'generator-surat-lamaran-kerja',
+        'simulasi-pertanyaan-interview',
+        'interview-answer-star',
+        'linkedin-headline-about-generator',
+        'job-description-matcher',
+        'ats-cv-checker',
+        'generator-job-description',
+    ];
+    $isCareerClusterTool = in_array($tool->slug, $careerClusterSlugs, true);
 @endphp
 
 @section('content')
@@ -752,11 +763,34 @@
                     <div class="mt-4 space-y-4">
                         @foreach ($relatedTools as $relatedTool)
                             @if (filled($relatedTool->slug))
-                                <a href="{{ route('tools.show', $relatedTool->slug) }}" class="block text-sm leading-6 text-slate-700 hover:text-blue-700">{{ $relatedTool->title }}</a>
+                                <a
+                                    href="{{ route('tools.show', $relatedTool->slug) }}"
+                                    class="block text-sm leading-6 text-slate-700 hover:text-blue-700"
+                                    data-analytics-related
+                                    data-related-name="{{ $relatedTool->slug }}"
+                                    data-related-section="tool_sidebar"
+                                >{{ $relatedTool->title }}</a>
                             @endif
                         @endforeach
                     </div>
                 </div>
+                @if ($isCareerClusterTool)
+                    <div class="card-panel p-6">
+                        <h2 class="text-lg font-semibold text-slate-900">Cluster Karier & Interview</h2>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">
+                            Lihat halaman cluster khusus untuk CV ATS, surat lamaran, latihan interview, dan profil LinkedIn dalam satu jalur yang lebih cepat.
+                        </p>
+                        <a
+                            href="{{ route('career.interview') }}"
+                            class="mt-4 inline-flex text-sm font-semibold text-blue-700"
+                            data-analytics-related
+                            data-related-name="career-interview-cluster"
+                            data-related-section="tool_sidebar_cluster"
+                        >
+                            Buka halaman Karier & Interview
+                        </a>
+                    </div>
+                @endif
                 <div class="card-panel p-6">
                     <h2 class="text-lg font-semibold text-slate-900">Template terkait</h2>
                     <div class="mt-4 space-y-4">

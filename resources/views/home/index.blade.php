@@ -230,17 +230,26 @@
                             Jika Anda sedang aktif melamar kerja, gunakan jalur cepat ini untuk merapikan CV, surat lamaran, latihan interview, sampai profil LinkedIn.
                         </p>
                     </div>
-                    <a href="{{ route('tools.index', ['search' => 'interview']) }}" class="text-sm font-medium text-blue-700">Lihat cluster karier</a>
+                    <a href="{{ route('career.interview') }}" class="text-sm font-medium text-blue-700">Lihat cluster karier</a>
                 </div>
                 <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     @foreach ($careerSpotlight as $tool)
-                        <a href="{{ route('tools.show', $tool->slug) }}" class="rounded-3xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-200 hover:bg-white">
+                        <a
+                            href="{{ route('tools.show', $tool->slug) }}"
+                            class="rounded-3xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-200 hover:bg-white"
+                            data-analytics-related
+                            data-related-name="{{ $tool->slug }}"
+                            data-related-section="home_career_spotlight"
+                        >
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $tool->category?->name }}</p>
                             <h3 class="mt-3 text-lg font-semibold text-slate-900">{{ $tool->title }}</h3>
                             <p class="mt-2 text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit($tool->short_description, 95) }}</p>
                             <span class="mt-4 inline-flex text-sm font-semibold text-blue-700">Gunakan sekarang</span>
                         </a>
                     @endforeach
+                </div>
+                <div class="mt-6 rounded-3xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm leading-7 text-blue-900">
+                    Sedang aktif cari kerja? Buka halaman <a href="{{ route('career.interview') }}" class="font-semibold underline decoration-blue-300 underline-offset-4">Karier & Interview</a> untuk melihat jalur cepat CV ATS, surat lamaran, latihan interview, dan profil LinkedIn dalam satu tempat.
                 </div>
             </div>
         </section>

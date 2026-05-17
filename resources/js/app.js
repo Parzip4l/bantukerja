@@ -353,6 +353,20 @@ const initializeCareerToolPresets = () => {
     }
 
     const presets = JSON.parse(source.textContent || '{}');
+    const emit = (eventName, params = {}) => {
+        const payload = {
+            page_location: window.location.pathname,
+            ...params,
+        };
+
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', eventName, payload);
+            return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: eventName, ...payload });
+    };
 
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-career-preset-fill]');
@@ -369,6 +383,11 @@ const initializeCareerToolPresets = () => {
             return;
         }
 
+        emit('career_tool_preset_click', {
+            tool_name: key,
+            preset_name: select?.value || 'unknown',
+        });
+
         const resolveValue = (object, key) => key.split('.').reduce((carry, part) => carry?.[part], object);
 
         document.querySelectorAll(`[data-career-preset-group="${key}"] [data-career-preset-field]`).forEach((field) => {
@@ -380,6 +399,8 @@ const initializeCareerToolPresets = () => {
             }
 
             field.value = Array.isArray(value) ? value.join(', ') : value;
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
         });
     });
 };
@@ -742,6 +763,16 @@ const initializeAnalyticsEvents = () => {
                 tool_name: exportTarget.getAttribute('data-tool-name') || 'unknown',
                 action: exportTarget.getAttribute('data-export-type') || 'export',
                 score_range: normalizeScoreRange(exportTarget.getAttribute('data-score-range')),
+            });
+        }
+
+        const relatedTarget = event.target.closest('[data-analytics-related]');
+
+        if (relatedTarget) {
+            emit('related_tool_click', {
+                tool_name: relatedTarget.getAttribute('data-related-name') || 'unknown',
+                action: 'open_related',
+                section: relatedTarget.getAttribute('data-related-section') || 'unknown',
             });
         }
     });

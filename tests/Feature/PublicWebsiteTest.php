@@ -46,6 +46,7 @@ class PublicWebsiteTest extends TestCase
             '/tools/job-description-matcher',
             '/tools/ats-cv-checker',
             '/tools/generator-laporan-kerja-harian',
+            '/karier-interview',
             '/template',
             '/template/surat-resign',
             '/blog',
@@ -77,6 +78,15 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Butuh sistem digital untuk bisnis atau perusahaan?')
             ->assertSee('Asisten Bantu Kerja')
             ->assertSee('Butuh bantuan?');
+    }
+
+    public function test_career_cluster_page_is_accessible(): void
+    {
+        $this->get('/karier-interview')
+            ->assertOk()
+            ->assertSee('Karier & Interview')
+            ->assertSee('Generator CV ATS')
+            ->assertSee('Simulasi Pertanyaan Interview');
     }
 
     public function test_assistant_search_can_find_career_and_business_tools(): void
@@ -449,6 +459,20 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Finance Staff');
     }
 
+    public function test_job_description_matcher_can_download_word(): void
+    {
+        $this->post('/tools/job-description-matcher/word', [
+            'template_slug' => 'jd-matcher-standard',
+            'target_position' => 'Finance Staff',
+            'job_description' => 'Membuat invoice, rekonsiliasi pembayaran, laporan keuangan, dan pengolahan data Excel.',
+            'profile_summary' => 'Lulusan akuntansi yang terbiasa mengolah data keuangan dan membuat laporan sederhana.',
+            'owned_skills' => 'Excel, invoice, rekonsiliasi, laporan keuangan',
+            'experience_summary' => 'Pernah membantu rekap invoice vendor dan laporan pembayaran saat magang.',
+            'education_level' => 'S1 Akuntansi',
+        ])->assertOk()
+            ->assertHeader('content-type', 'application/msword; charset=UTF-8');
+    }
+
     public function test_daily_work_report_generator_can_preview_document(): void
     {
         $response = $this->from('/tools/generator-laporan-kerja-harian')->post('/tools/generator-laporan-kerja-harian/preview', [
@@ -480,6 +504,30 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Preview Laporan Harian')
             ->assertSee('Laporan Harian Karyawan')
             ->assertSee('Rekap data absensi');
+    }
+
+    public function test_ats_cv_checker_can_download_word(): void
+    {
+        $response = $this->from('/tools/ats-cv-checker')->post('/tools/ats-cv-checker/preview', [
+            'template_slug' => 'ats-cv-checker-standard',
+            'target_position' => 'Digital Marketing',
+            'experience_level' => '1-3-tahun',
+            'cv_text' => "Profil\nAyu Maharani\nDigital Marketing Specialist\nayu@example.com\n08123456789\nPengalaman kerja campaign SEO dan Google Ads\nPendidikan S1 Ilmu Komunikasi\nSkill SEO Google Ads Analytics\nMeningkatkan lead 40 persen",
+            'main_skills' => 'SEO, Google Ads, Analytics',
+            'target_industry' => 'Marketing',
+        ]);
+
+        $response->assertRedirect('/tools/ats-cv-checker');
+
+        $this->post('/tools/ats-cv-checker/word', [
+            'template_slug' => 'ats-cv-checker-standard',
+            'target_position' => 'Digital Marketing',
+            'experience_level' => '1-3-tahun',
+            'cv_text' => "Profil\nAyu Maharani\nDigital Marketing Specialist\nayu@example.com\n08123456789\nPengalaman kerja campaign SEO dan Google Ads\nPendidikan S1 Ilmu Komunikasi\nSkill SEO Google Ads Analytics\nMeningkatkan lead 40 persen",
+            'main_skills' => 'SEO, Google Ads, Analytics',
+            'target_industry' => 'Marketing',
+        ])->assertOk()
+            ->assertHeader('content-type', 'application/msword; charset=UTF-8');
     }
 
     public function test_admin_user_can_access_filament_resources(): void
@@ -639,4 +687,5 @@ class PublicWebsiteTest extends TestCase
             'is_active' => true,
         ]);
     }
+
 }
