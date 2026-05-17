@@ -83,7 +83,7 @@
         @endif
 
         <div class="mt-5 rounded-3xl border border-amber-100 bg-amber-50 p-4 text-sm leading-7 text-amber-900">
-            Tools ini tidak menggunakan AI API. Input Anda hanya dipakai untuk menghasilkan hasil pada sesi ini. Jangan masukkan data yang terlalu sensitif jika tidak diperlukan.
+            Input Anda hanya dipakai untuk menghasilkan hasil pada sesi ini. Jangan masukkan data yang terlalu sensitif jika tidak diperlukan.
         </div>
         <div class="mt-5 rounded-3xl border border-blue-100 bg-blue-50 p-4 text-sm leading-7 text-blue-900">
             Lanjutkan latihan Anda dengan <a href="{{ route('tools.show', 'interview-answer-star') }}" class="font-semibold underline decoration-blue-300 underline-offset-4">Generator Jawaban Interview STAR</a> atau cek kesiapan lamaran di <a href="{{ route('tools.show', 'ats-cv-checker') }}" class="font-semibold underline decoration-blue-300 underline-offset-4">ATS CV Checker</a>.

@@ -384,6 +384,294 @@ const initializeCareerToolPresets = () => {
     });
 };
 
+const initializeAssistantWidget = () => {
+    const widget = document.querySelector('[data-assistant-widget]');
+
+    if (!widget) {
+        return;
+    }
+
+    const endpoint = widget.getAttribute('data-assistant-endpoint');
+    const toggle = widget.querySelector('[data-assistant-toggle]');
+    const closeButton = widget.querySelector('[data-assistant-close]');
+    const panel = widget.querySelector('[data-assistant-panel]');
+    const messages = widget.querySelector('[data-assistant-messages]');
+    const form = widget.querySelector('[data-assistant-form]');
+    const input = widget.querySelector('[data-assistant-input]');
+    const submit = widget.querySelector('[data-assistant-submit]');
+    const chipContainer = widget.querySelector('[data-assistant-chips]');
+
+    if (!endpoint || !toggle || !closeButton || !panel || !messages || !form || !input || !submit || !chipContainer) {
+        return;
+    }
+
+    const emit = (eventName, params = {}) => {
+        const payload = {
+            page_location: window.location.pathname,
+            ...params,
+        };
+
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', eventName, payload);
+            return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: eventName, ...payload });
+    };
+
+    const escapeText = (value) => String(value ?? '').trim();
+
+    const openPanel = () => {
+        panel.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        input.focus();
+    };
+
+    const closePanel = () => {
+        panel.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    const scrollToBottom = () => {
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    const wait = (duration) => new Promise((resolve) => {
+        window.setTimeout(resolve, duration);
+    });
+
+    const createMessageShell = (type) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = type === 'user'
+            ? 'mt-3 flex justify-end'
+            : 'mt-3 flex justify-start';
+
+        const bubble = document.createElement('div');
+        bubble.className = type === 'user'
+            ? 'max-w-[88%] rounded-[1.5rem] rounded-br-md bg-slate-900 px-4 py-3 text-sm leading-7 text-white'
+            : 'max-w-[88%] rounded-[1.5rem] rounded-bl-md bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700';
+
+        wrapper.appendChild(bubble);
+        return { wrapper, bubble };
+    };
+
+    const appendUserMessage = (text) => {
+        const { wrapper, bubble } = createMessageShell('user');
+        bubble.textContent = escapeText(text);
+        messages.appendChild(wrapper);
+        scrollToBottom();
+    };
+
+    const renderResultCard = (item) => {
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.className = 'block rounded-2xl border border-slate-200 bg-white px-3 py-3 transition hover:border-blue-200 hover:bg-blue-50/40';
+        link.addEventListener('click', () => {
+            emit('assistant_result_click', {
+                result_type: item.type,
+                clicked_url: item.url,
+            });
+        });
+
+        const header = document.createElement('div');
+        header.className = 'flex items-start justify-between gap-3';
+
+        const content = document.createElement('div');
+
+        const title = document.createElement('p');
+        title.className = 'text-sm font-semibold text-slate-900';
+        title.textContent = item.title;
+
+        const description = document.createElement('p');
+        description.className = 'mt-1 text-xs leading-6 text-slate-500';
+        description.textContent = item.description;
+
+        content.append(title, description);
+
+        const badge = document.createElement('span');
+        badge.className = 'shrink-0 pt-0.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400';
+        badge.textContent = item.type;
+
+        header.append(content, badge);
+        link.appendChild(header);
+
+        return link;
+    };
+
+    const appendAssistantReply = (payload) => {
+        const { wrapper, bubble } = createMessageShell('assistant');
+
+        const text = document.createElement('p');
+        text.className = 'text-sm leading-7 text-slate-700';
+        text.textContent = escapeText(payload.reply);
+        bubble.appendChild(text);
+
+        if (Array.isArray(payload.results) && payload.results.length > 0) {
+            const results = document.createElement('div');
+            results.className = 'mt-3 space-y-2';
+            payload.results.slice(0, 5).forEach((item) => {
+                results.appendChild(renderResultCard(item));
+            });
+            bubble.appendChild(results);
+        }
+
+        if (Array.isArray(payload.suggestions) && payload.suggestions.length > 0) {
+            const chips = document.createElement('div');
+            chips.className = 'mt-3 flex flex-wrap gap-2';
+            payload.suggestions.slice(0, 5).forEach((suggestion) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 hover:border-blue-300 hover:text-blue-700';
+                button.textContent = suggestion;
+                button.setAttribute('data-assistant-run', suggestion);
+                chips.appendChild(button);
+            });
+            bubble.appendChild(chips);
+        }
+
+        messages.appendChild(wrapper);
+        scrollToBottom();
+    };
+
+    const appendStatusMessage = (text) => {
+        const { wrapper, bubble } = createMessageShell('assistant');
+        bubble.className = 'max-w-[88%] rounded-[1.5rem] rounded-bl-md bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-500';
+
+        const row = document.createElement('div');
+        row.className = 'inline-flex items-center gap-2';
+
+        const label = document.createElement('span');
+        label.textContent = text;
+
+        const dots = document.createElement('span');
+        dots.className = 'inline-flex items-center gap-1';
+
+        for (let index = 0; index < 3; index += 1) {
+            const dot = document.createElement('span');
+            dot.className = 'h-1.5 w-1.5 rounded-full bg-slate-300 animate-pulse';
+            dot.style.animationDelay = `${index * 140}ms`;
+            dots.appendChild(dot);
+        }
+
+        row.append(label, dots);
+        bubble.appendChild(row);
+        messages.appendChild(wrapper);
+        scrollToBottom();
+
+        return wrapper;
+    };
+
+    const sendMessage = async (rawMessage, source = 'typed') => {
+        const message = escapeText(rawMessage).slice(0, 300);
+
+        if (message.length < 2) {
+            return;
+        }
+
+        openPanel();
+        appendUserMessage(message);
+        input.value = '';
+        submit.disabled = true;
+        submit.textContent = 'Mencari...';
+
+        if (source === 'chip') {
+            emit('assistant_chip_click', {
+                query_category: 'shortcut',
+                result_count: 0,
+            });
+        }
+
+        const loading = appendStatusMessage('Mencari...');
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ message }),
+            });
+
+            const payload = await response.json();
+
+            await wait(1000);
+            loading.remove();
+
+            if (!response.ok) {
+                throw new Error(payload?.message || 'Request failed');
+            }
+
+            appendAssistantReply(payload);
+
+            emit('assistant_search', {
+                query_category: payload.query_category || 'general',
+                result_count: payload.result_count || 0,
+            });
+
+            if (!payload.result_count) {
+                emit('assistant_no_result', {
+                    query_category: payload.query_category || 'general',
+                    result_count: 0,
+                });
+            }
+        } catch (error) {
+            await wait(1000);
+            loading.remove();
+            appendAssistantReply({
+                reply: 'Terjadi kendala saat mencari. Coba lagi sebentar atau buka halaman Tools, Template, Blog, atau Contact.',
+                results: [
+                    { title: 'Semua Tools', type: 'Halaman', description: 'Lihat daftar tools publik yang tersedia.', url: '/tools' },
+                    { title: 'Template Dokumen', type: 'Halaman', description: 'Buka kumpulan template dokumen yang bisa digunakan.', url: '/template' },
+                    { title: 'Hubungi Bantu Kerja', type: 'Halaman', description: 'Kontak untuk masukan, bug, atau kerja sama.', url: '/contact' },
+                ],
+                suggestions: ['Invoice', 'CV ATS', 'Template', 'Contact'],
+            });
+        } finally {
+            submit.disabled = false;
+            submit.textContent = 'Kirim';
+        }
+    };
+
+    toggle.addEventListener('click', () => {
+        if (panel.classList.contains('hidden')) {
+            openPanel();
+            emit('assistant_open', { page_location: window.location.pathname });
+            return;
+        }
+
+        closePanel();
+    });
+
+    closeButton.addEventListener('click', closePanel);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+            closePanel();
+        }
+    });
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        sendMessage(input.value, 'typed');
+    });
+
+    chipContainer.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-assistant-chip], [data-assistant-run]');
+
+        if (!chip) {
+            return;
+        }
+
+        sendMessage(
+            chip.getAttribute('data-assistant-chip') || chip.getAttribute('data-assistant-run') || '',
+            'chip',
+        );
+    });
+};
+
 const initializeAnalyticsEvents = () => {
     const normalizeScoreRange = (value) => {
         const numeric = Number.parseInt(value, 10);
@@ -466,4 +754,5 @@ initializeRupiahInputs();
 initializeGeneratorPresets();
 initializeHomeSearch();
 initializeCareerToolPresets();
+initializeAssistantWidget();
 initializeAnalyticsEvents();

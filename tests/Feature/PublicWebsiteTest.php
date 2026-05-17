@@ -74,7 +74,86 @@ class PublicWebsiteTest extends TestCase
             ->assertSee('Kenapa menggunakan Bantu Kerja?')
             ->assertSee('Pilih tools sesuai kebutuhan Anda')
             ->assertSee('Cara menggunakan Bantu Kerja')
-            ->assertSee('Butuh sistem digital untuk bisnis atau perusahaan?');
+            ->assertSee('Butuh sistem digital untuk bisnis atau perusahaan?')
+            ->assertSee('Asisten Bantu Kerja')
+            ->assertSee('Butuh bantuan?');
+    }
+
+    public function test_assistant_search_can_find_career_and_business_tools(): void
+    {
+        $this->postJson('/api/assistant/search', [
+            'message' => 'cv ats',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'career')
+            ->assertJsonFragment([
+                'url' => 'http://localhost/tools/generator-cv-ats',
+            ]);
+
+        $this->postJson('/api/assistant/search', [
+            'message' => 'invoice',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'business')
+            ->assertJsonFragment([
+                'title' => 'Generator Invoice',
+                'type' => 'Tool',
+                'url' => 'http://localhost/tools/generator-invoice',
+            ]);
+
+        $this->postJson('/api/assistant/search', [
+            'message' => 'kwitansi',
+        ])->assertOk()
+            ->assertJsonFragment([
+                'title' => 'Generator Kwitansi',
+                'type' => 'Tool',
+                'url' => 'http://localhost/tools/generator-kwitansi',
+            ]);
+    }
+
+    public function test_assistant_search_can_find_hr_productivity_and_contact_content(): void
+    {
+        $this->postJson('/api/assistant/search', [
+            'message' => 'thr',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'hr')
+            ->assertJsonFragment([
+                'title' => 'Kalkulator THR',
+                'type' => 'Tool',
+                'url' => 'http://localhost/tools/kalkulator-thr',
+            ]);
+
+        $this->postJson('/api/assistant/search', [
+            'message' => 'laporan kerja harian',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'productivity')
+            ->assertJsonFragment([
+                'url' => 'http://localhost/tools/generator-laporan-kerja-harian',
+            ]);
+
+        $this->postJson('/api/assistant/search', [
+            'message' => 'contact',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'contact')
+            ->assertJsonFragment([
+                'url' => 'http://localhost/contact',
+            ]);
+    }
+
+    public function test_assistant_search_returns_safe_faq_and_out_of_scope_fallbacks(): void
+    {
+        $this->postJson('/api/assistant/search', [
+            'message' => 'data saya disimpan tidak?',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'privacy')
+            ->assertJsonPath('result_count', 1)
+            ->assertJsonFragment([
+                'url' => 'http://localhost/privacy-policy',
+            ]);
+
+        $this->postJson('/api/assistant/search', [
+            'message' => 'siapa presiden indonesia sekarang?',
+        ])->assertOk()
+            ->assertJsonPath('query_category', 'general')
+            ->assertJsonPath('result_count', 0);
     }
 
     public function test_thr_calculator_returns_result_in_session(): void
