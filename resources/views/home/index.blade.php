@@ -53,6 +53,45 @@
     </section>
 
     <section class="container-shell py-10">
+        <div class="card-panel p-6 sm:p-7">
+            <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+                <div>
+                    <p class="eyebrow">Trust & usability</p>
+                    <h2 class="section-heading mt-3">Kenapa menggunakan Bantu Kerja?</h2>
+                    <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
+                        Bantu Kerja dirancang agar siapa pun bisa membuat dokumen kerja, bisnis, dan administrasi harian secara cepat tanpa proses yang rumit.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                @foreach ([
+                    ['title' => 'Gratis digunakan', 'description' => 'Gunakan berbagai tools dasar untuk membuat dokumen dan kalkulasi kerja tanpa biaya.'],
+                    ['title' => 'Tanpa login untuk tools publik', 'description' => 'Banyak tools bisa langsung digunakan dari browser tanpa membuat akun terlebih dahulu.'],
+                    ['title' => 'Preview langsung', 'description' => 'Lihat hasil dokumen secara langsung sebelum disalin, dicetak, atau diunduh.'],
+                    ['title' => 'Bisa copy, print, dan download', 'description' => 'Hasil dokumen dapat digunakan kembali sesuai kebutuhan, baik untuk kerja, bisnis, maupun administrasi harian.'],
+                    ['title' => 'Fokus kebutuhan Indonesia', 'description' => 'Template dan tools dibuat dengan konteks penggunaan masyarakat Indonesia, seperti invoice, kwitansi, CV, surat kerja, dan kebutuhan HR sederhana.'],
+                    ['title' => 'Data tidak disimpan permanen', 'description' => 'Input pada tools publik tidak disimpan permanen kecuali ada fitur khusus yang meminta persetujuan pengguna.'],
+                ] as $point)
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                        <h3 class="text-lg font-semibold text-slate-900">{{ $point['title'] }}</h3>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">{{ $point['description'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-8 flex flex-col items-start gap-4 rounded-3xl border border-blue-100 bg-blue-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p class="max-w-2xl text-sm leading-7 text-blue-900">
+                    Mulai gunakan tools gratis Bantu Kerja untuk menyelesaikan kebutuhan administrasi harian dengan lebih cepat.
+                </p>
+                <a href="{{ route('tools.index') }}" class="inline-flex h-11 items-center rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-blue-700">
+                    Lihat Semua Tools
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="container-shell py-10">
         <div class="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <div class="card-panel p-6">
                 <p class="eyebrow">Kategori tools</p>
